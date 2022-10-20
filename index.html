@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Enlight NPU :: Model Zoo</title>
+	<style>
+		table {
+			border-collapse: collapse;
+		}
+
+		th, td {
+			text-align: center;
+			padding: 10px
+		}
+
+		th {
+			border-bottom: 1px solid #000;
+		}
+
+		td {
+			border-bottom: 1px solid #d0d0d0;
+		}
+
+		li {
+			padding: 5px;
+		}
+		a {
+			color: #555;
+		}
+
+		h2 {
+			margin-top: 40px;
+		}
+
+		h3 {
+			margin-top: 30px;
+		}
+	</style>
+</head>
+<body>
+
+<h1>Enlight NPU :: Model Zoo</h1>
+
+<ul>
+	<li><a href="#classification_networks">Classification Networks</a></li>
+	<li><a href="#object_detection_networks">Object Detection Networks</a></li>
+	<li><a href="#face_detection_networks">Face Detection Networks</a></li>
+	<li><a href="#pose_estimation_networks">Pose Estimation Networks</a></li>
+</ul>
+
+<h2 id="classification_networks">Classification Networks</h2>
+	
+<h3>ImageNet Results</h3>
+
+<div>
+		
+	<table width="1280">
+	<thead>
+		<tr>
+			<th>Model Name</th>
+			<th>Type</th>
+			<th>Input Size</th>
+			<th>Top1 Acc (FP32)</th>
+			<th>Top1 Accuracy (INT8)</th>
+			<th>Giga MAC</th>
+			<th>FPS</th>
+			<th>Preview</th>
+			<th>Source</th>
+		</tr>
+	</thead> 
+	<tr>
+		<td>mobilenetv2-7</td>
+		<td>ONNX</td>
+		<td>224x224</td>
+		<td>88.6</td>
+		<td>88.1</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><a href="https://github.com/onnx/models/blob/master/vision/classification/mobilenet/model/mobilenetv2-7.onnx">link</a></td>
+	</tr>
+	<tr>
+		<td>mobilenet_v2</td>
+		<td>PyTorch</td>
+		<td>224x224</td>
+		<td>88.6</td>
+		<td>88.1</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
+	</tr>
+	<tr>
+		<td>resnet18</td>
+		<td>PyTorch</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
+	</tr>
+	<tr>
+		<td>resnet34</td>
+		<td>PyTorch</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
+	</tr>
+	<tr>
+		<td>resnet50</td>
+		<td>PyTorch</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
+	</tr>
+	<tr>
+		<td>efficientnet-b0*</td>
+		<td>ONNX</td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td></td>
+		<td>in-house</td>
+	</tr>
+	</table>
+		
+	<p>* SE layer is removed and MbConv5x5(repeat=1) is replaced by MbConv3x3(repeat=2) for EfficientNet</p>
+</div>
+
+
+<h2 id="object_detection_networks">Object Detection Networks</h2>
+	
+<h3>VOC2007 Dataset Results</h3> 
+	
+<div>
+		
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>mAP (FP32)</th>
+				<th>mAP (INT8)</th>
+				<th>Giga MAC</th>
+				<th>FPS</th>
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead> 
+		<tr>
+			<td rowspan="2">ssdlite</td>
+			<td rowspan="2">ONNX</td>
+			<td>300x300</td>
+			<td>70.7</td>
+			<td>70.1</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td rowspan="2">in-house</td>
+		</tr>
+		<tr>
+			<td>512x512</td>
+			<td>74.8</td>
+			<td>74.0</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>YOLOv2*</td>
+			<td>DarkNet</td>
+			<td>416x416</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>YOLOv2-tiny</td>
+			<td>DarkNet</td>
+			<td>416x416</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+
+	<p>* YOLOv2 is trained after replacing buggy reorg layer to reorg3d layer.</p>			
+</div>
+	
+<h3>COCO2014 Dataset Results</h3>
+	
+<div>
+		
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>AP (FP32)</th>
+				<th>AP (INT8)</th>
+				<th>Giga MAC</th>
+				<th>FPS</th>
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead> 
+		<tr>
+			<td>ssd_mobilenet_v2_320x320</td>
+			<td>TfLite</td>
+			<td>320x320</td>
+			<td>33.6@IoU=0.5<br />19.2@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><a href="http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_320x320_coco17_tpu-8.tar.gz">link</a></td>
+		</tr>
+		<tr>
+			<td>YOLOv2* </td>
+			<td>DarkNet</td>
+			<td>416x416</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td>in-house</td>
+		</tr>
+		<tr>
+			<td>YOLOv2-tiny</td>
+			<td>DarkNet</td>
+			<td>416x416</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td rowspan="3">YOLOv3</td>
+			<td rowspan="3">DarkNet</td>
+			<td>320x320</td>
+			<td>60.8@IoU=0.5<br />34.2@IoU=0.5:0.95</td>
+			<td>60.6@IoU=0.5<br />34.0@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td rowspan="3"></td>
+		</tr>
+		<tr>
+			<td>416x416</td>
+			<td>64.8@IoU=0.5<br />36.9@IoU=0.5:0.95</td>
+			<td>64.9@IoU=0.5<br />37.0@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>608x608</td>
+			<td>65.3@IoU=0.5<br />37.3@IoU=0.5:0.95</td>
+			<td>65.3@IoU=0.5<br />37.1@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>YOLOv3-tiny</td>
+			<td>DarkNet</td>
+			<td>416x416</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><a href="https://github.com/pjreddie/darknet/blob/master/cfg/yolov3-tiny.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov3-tiny.weights">weights</a></td>
+		</tr>
+		<tr>
+			<td>YOLOv3-spp</td>
+			<td>DarkNet</td>
+			<td>608x608</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><a href="https://github.com/pjreddie/darknet/blob/master/cfg/yolov3-spp.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov3-spp.weights">weights</a></td>
+		</tr>
+		<tr>
+			<td rowspan="4">YOLOv4</td>
+			<td rowspan="4">DarkNet</td>
+			<td>320x320</td>
+			<td>61.2@IoU=0.5<br />39.5@IoU=0.5:0.95</td>
+			<td>60.4@IoU=0.5<br />38.5@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td rowspan="4"><a href="https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4.cfg">cfg</a>, <a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights">weights</a></td>
+		</tr>
+		<tr>
+			<td>416x416</td>
+			<td>68.7@IoU=0.5<br />45.4@IoU=0.5:0.95</td>
+			<td>67.8@IoU=0.5<br />44.3@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>512x512</td>
+			<td>71.6@IoU=0.5<br />48.2@IoU=0.5:0.95</td>
+			<td>70.8@IoU=0.5<br />46.9@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>608x608</td>
+			<td>72.3@IoU=0.5<br />48.7@IoU=0.5:0.95</td>
+			<td>72.0@IoU=0.5<br />47.7@IoU=0.5:0.95</td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td rowspan="2">YOLOv4-csp</td>
+			<td rowspan="2">DarkNet</td>
+			<td>512x512</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td rowspan="2"><a href="https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-csp.cfg">cfg</a>, <a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights">weights</a></td>
+		</tr>
+		<tr>
+			<td>640x640</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>YOLOv4-tiny </td>
+			<td>DarkNet</td>
+			<td>416x416</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td></td>
+			<td>DarkNet</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+</div>
+
+<p>* YOLOv2 is trained after replacing buggy reorg layer to reorg3d layer.</p>
+	
+<h2 id="face_detection_networks">Face Detection Networks</h2>
+
+
+<div>
+		
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>AP (FP32)</th>
+				<th>AP (INT8)</th>
+				<th>Giga MAC</th>
+				<th>FPS</th>
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead>
+		<tr>
+			<td>Blaze Face</td>
+			<td>TfLite*</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><a href="https://github.com/google/mediapipe/tree/master/mediapipe/graphs/face_detection">link</a></td>
+		</tr>
+	</table>
+</div>
+
+<p>* TfLite model is converted from ProtoBuf model.</p>
+	
+<h3 id="pose_estimation_networks">Pose Estimation Networks</h3>
+	
+<div>
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>AP (FP32)</th>
+				<th>AP (INT8)</th>
+				<th>Giga MAC</th>
+				<th>FPS</th>
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead>
+		<tr>
+			<td>YOLO-pose</td>
+			<td>ONNX</td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td></td>
+			<td><a href="https://github.com/TexasInstruments/edgeai-yolov5/tree/yolo-pose">link</a></td>
+		</tr>
+	</table>
+</div>
+	
+<h2>References</h2>
+<div>
+	<ul>
+		<li>
+			Classification Networks
+			<ul>
+				<li><a href="https://arxiv.org/abs/1801.04381">MobileNetV2: Inverted Residuals and Linear Bottlenecks</a></li>
+				<li><a href="https://arxiv.org/abs/1512.03385">Deep Residual Learning for Image Recognition</a></li>
+			</ul>
+		</li>
+		<li>
+			Object Detection Networks
+			<ul>
+				<li><a href="https://arxiv.org/abs/1512.02325">SSD: Single Shot MultiBox Detector</a></li>
+				<li><a href="https://arxiv.org/abs/1612.08242">YOLO9000: Better, Faster, Stronger</a></li>
+				<li><a href="https://arxiv.org/abs/1804.02767">[YOLOv3: An Incremental Improvement</a></li>
+				<li><a href="https://arxiv.org/abs/2004.10934">[YOLOv4: Optimal Speed and Accuracy of Object Detection</a></li>
+				<li><a href="https://arxiv.org/abs/2107.08430">YOLOX: Exceeding YOLO Series in 2021</a></li>
+				<li><a href="https://arxiv.org/abs/2207.02696">YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors</a></li>
+			</ul>
+		</li>
+		<li>
+			Face Detection Networks
+			<ul>
+				<li>BlazeFace</li>
+			</ul>
+		</li>
+		<li>
+			Pose Estimation Networks
+			<ul>
+				<li><a href="https://arxiv.org/abs/2204.06806">YOLO-Pose: Enhancing YOLO for Multi Person Estimation Using Object Keypoint Similarity Loss</a></li>
+			</ul>
+		</li>
+	</ul>
+</div>
+
+</body>
+</html>
