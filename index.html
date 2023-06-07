@@ -476,6 +476,8 @@
 	
 <h2 id="instance_segmentation_networks">Instance Segmentation Networks</h2>
 
+<h3>COCO2017 Results</h3>
+
 <div>
 	<table width="1280">
 		<thead>
@@ -483,8 +485,8 @@
 				<th>Model Name</th>
 				<th>Type</th>
 				<th>Input Size</th>
-				<th>mAP (FP32)</th>
-				<th>mAP (INT8)</th>
+				<th>mask mAP* (FP32)</th>
+				<th>mask mAP* (INT8)</th>
 				<th>Giga MAC</th>
 				<!-- th>FPS</th -->
 				<th>Preview</th>
@@ -512,6 +514,8 @@
 		</tr>
 	</table>
 </div>
+
+<p>* mask mAP uses mask IoU instead of IoU</p>
 
 <h2 id="face_detection_networks">Face Detection Networks</h2>
 
@@ -612,6 +616,12 @@
 			Pose Estimation Networks
 			<ul>
 				<li><a href="https://arxiv.org/abs/2204.06806">YOLO-Pose: Enhancing YOLO for Multi Person Estimation Using Object Keypoint Similarity Loss</a></li>
+			</ul>
+		</li>
+		<li>
+			Metrics
+			<ul>
+				<li><a href="https://arxiv.org/abs/1903.00241.pdf">Mask Scoring R-CNN</a></li>
 			</ul>
 		</li>
 	</ul>
