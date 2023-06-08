@@ -70,6 +70,7 @@
 <ul>
 	<li><a href="#classification_networks">Classification Networks</a></li>
 	<li><a href="#object_detection_networks">Object Detection Networks</a></li>
+	<li><a href="#semantic_segmentation_networks">Semantic Segmentation Networks</a></li>
 	<li><a href="#instance_segmentation_networks">Instance Segmentation Networks</a></li>
 	<li><a href="#face_detection_networks">Face Detection Networks</a></li>
 	<li><a href="#pose_estimation_networks">Pose Estimation Networks</a></li>
@@ -473,7 +474,39 @@
 </div>
 
 <p>* YOLOv2 is trained after replacing buggy reorg layer to reorg3d layer.</p>
-	
+
+<h2 id="semantic_segmentation_networks">Semantic Segmentation Networks</h2>
+
+<h3>Cityscape Results</h3>
+
+<div>
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>mIoU / Pixel Acc / Mean Acc (FP32)</th>
+				<th>mIoU / Pixel Acc / Mean Acc (INT8)</th>
+				<th>Giga MAC</th>
+				<!-- th>FPS</th -->
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead>
+		<tr>
+			<td>PIDNet-S</td>
+			<td>ONNX</td>
+			<td>2048x1024</td>
+			<td>78.1 / 96.1 / 85.8</td>
+			<td>77.9 / 96.0 / 85.6</td>
+			<td>50.5</td>
+			<!-- td></td -->
+			<td></td>
+			<td><a href="https://github.com/XuJiacong/PIDNet">link</a></td>
+		</tr>
+	</table>
+</div>
 <h2 id="instance_segmentation_networks">Instance Segmentation Networks</h2>
 
 <h3>COCO2017 Results</h3>
@@ -602,8 +635,15 @@
 			</ul>
 		</li>
 		<li>
+			Semantic Segmentation Networks
+			<ul>
+				<li><a href="https://arxiv.org/abs/2206.02066">PIDNet: A Real-time Semantic Segmentation Network Inspired by PID Controllers</a></li>
+			</ul>
+		</li>
+		<li>
 			Instance Segmentation Networks
 			<ul>
+				<li><a href="https://arxiv.org/abs/1904.02689">YOLACT: Real-time Instance Segementation</a></li>
 				<li><a href="https://arxiv.org/abs/1912.06218">YOLACT++: Better Real-time Instance Segementation</a></li>
 				<li><a href="https://arxiv.org/abs/2012.12259">YolactEdge: Real-time Instance Segmentation on the Edge</a></li>
 			</ul>
@@ -621,9 +661,21 @@
 			</ul>
 		</li>
 		<li>
+			DataSets
+			<ul>
+				<li><a href="https://www.image-net.org">ImageNet is an image database organized according to the WordNet hierarchy (currently only the nouns), in which each node of the hierarchy is depicted by hundreds and thousands of images.</a></li>
+				<li><a href="http://host.robots.ox.ac.uk/pascal/VOC/">PASCAL Visual Object Classes (VOC)</a></li>
+				<li><a href="https://cocodataset.org/">COCO is a large-scale object detection, segmentation, and captioning dataset. </a></li>
+				<li><a href="https://www.cityscapes-dataset.com">Cityscape: Benchmark suite and evaluation server for pixel-level, instance-level, and panoptic semantic labeling</a></li>
+			</ul>
+		</li>
+		<li>
 			Metrics
 			<ul>
-				<li><a href="https://arxiv.org/abs/1903.00241.pdf">Mask Scoring R-CNN</a></li>
+				<li> <a href="http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf">mAP: The PASCAL Visual Object Classes (VOC) Challenge</a></li>
+				<li><a href="https://arxiv.org/abs/1903.00241">Mask mAP: Mask Scoring R-CNN</a></li>
+				<li><a href="https://cocodataset.org/#detection-eval">Average Precision (AP): Detection Evaluation (COCO)</a></li>
+				<li><a href="https://cocodataset.org/#keypoints-eval">Object Keypoint Similarity (OKS): Keypoint Evaluation (COCO)</a></li>
 			</ul>
 		</li>
 	</ul>
