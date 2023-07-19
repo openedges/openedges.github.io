@@ -74,6 +74,8 @@
 	<li><a href="#instance_segmentation_networks">Instance Segmentation Networks</a></li>
 	<li><a href="#face_detection_networks">Face Detection Networks</a></li>
 	<li><a href="#pose_estimation_networks">Pose Estimation Networks</a></li>
+	<li><a href="#lane_detection_networks">Lane Detection Networks</a></li>
+	<li><a href="#mono_depth_estimation_networks">Monocular Depth Estimation Networks</a></li>
 </ul>
 
 <h2 id="classification_networks">Classification Networks</h2>
@@ -613,6 +615,72 @@
 	</table>
 </div>
 	
+<h2 id="lane_detection_networks">Lane Detection Networks</h2>
+
+<h3>CULane Results</h3>
+
+<div>
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>F1-Score (FP32)</th>
+				<th>F1-Score (INT8)</th>
+				<th>Giga MAC</th>
+				<!-- th>FPS</th -->
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead>
+		<tr>
+			<td>UFLD v1</td>
+			<td>ONNX</td>
+			<td>800x288</td>
+			<td>69.1</td>
+			<td>68.6</td>
+			<td>8.95</td>
+			<!-- td></td -->
+			<td></td>
+			<td><a href="https://github.com/cfzd/Ultra-Fast-Lane-Detection">link</a></td>
+		</tr>
+	</table>
+</div>
+	
+<h2 id="mono_depth_estimation_networks">Monocular Depth Estimation Networks</h2>
+
+<h3>KITTI Eigen Split Results</h3>
+
+<div>
+	<table width="1280">
+		<thead>
+			<tr>
+				<th>Model Name</th>
+				<th>Type</th>
+				<th>Input Size</th>
+				<th>ARE (FP32)</th>
+				<th>ARE (INT8)</th>
+				<th>Giga MAC</th>
+				<!-- th>FPS</th -->
+				<th>Preview</th>
+				<th>Source</th>
+			</tr>
+		</thead>
+		<tr>
+			<td>Monodepth2</td>
+			<td>ONNX</td>
+			<td>640x192</td>
+			<td>11.1</td>
+			<td>12.6</td>
+			<td>8.74</td>
+			<!-- td></td -->
+			<td></td>
+			<td><a href="https://github.com/nianticlabs/monodepth2">link</a></td>
+		</tr>
+	</table>
+</div>
+	
 <h2>References</h2>
 <div>
 	<ul>
@@ -661,12 +729,26 @@
 			</ul>
 		</li>
 		<li>
+			Lane Detection Networks
+			<ul>
+				<li><a href="https://arxiv.org/abs/2004.11757">Ultra Fast Structure-aware Deep Lane Detection</a></li>
+			</ul>
+		</li>
+		<li>
+			Monocular Depth Estimation Networks
+			<ul>
+				<li><a href="https://arxiv.org/abs/1806.01260">Digging Into Self-Supervised Monocular Depth Estimation</a></li>
+			</ul>
+		</li>
+		<li>
 			DataSets
 			<ul>
 				<li><a href="https://www.image-net.org">ImageNet is an image database organized according to the WordNet hierarchy (currently only the nouns), in which each node of the hierarchy is depicted by hundreds and thousands of images.</a></li>
 				<li><a href="http://host.robots.ox.ac.uk/pascal/VOC/">PASCAL Visual Object Classes (VOC)</a></li>
 				<li><a href="https://cocodataset.org/">COCO is a large-scale object detection, segmentation, and captioning dataset. </a></li>
 				<li><a href="https://www.cityscapes-dataset.com">Cityscape: Benchmark suite and evaluation server for pixel-level, instance-level, and panoptic semantic labeling</a></li>
+				<li><a href="https://xingangpan.github.io/projects/CULane.html">CULane: CULane is a large scale challenging dataset for academic research on traffic lane detection.</a></li>
+				<li><a href="https://www.cvlibs.net/datasets/kitti/">KITTI: Dataset for stereo, optical flow, visual odometry, 3D object detection and 3D tracking</a></li>
 			</ul>
 		</li>
 		<li>
@@ -676,6 +758,8 @@
 				<li><a href="https://arxiv.org/abs/1903.00241">Mask mAP: Mask Scoring R-CNN</a></li>
 				<li><a href="https://cocodataset.org/#detection-eval">Average Precision (AP): Detection Evaluation (COCO)</a></li>
 				<li><a href="https://cocodataset.org/#keypoints-eval">Object Keypoint Similarity (OKS): Keypoint Evaluation (COCO)</a></li>
+				<li><a href="https://en.wikipedia.org/wiki/F-score">F1-Score: F-score is a measure of a test's accuracy</a></li>
+				<li><a href="https://oecd.ai/en/catalogue/metrics/absolute-relative-error-%28are%29">Absolute Relative Error (ARE)</a></li>
 			</ul>
 		</li>
 	</ul>
