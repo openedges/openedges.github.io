@@ -67,9 +67,9 @@
 #arrowhead-select { fill: rgba(220, 0, 0, 0.9); }
 
 .edge-paths { pointer-events: none; }
-.edge-path { stroke: #000; stroke-width: 2px; fill: none; marker-end: url("#arrowhead"); }
-.edge-path-float { stroke: #a52; stroke-width: 2px; fill: none; marker-end: url("#arrowhead"); }
-.edge-path-int { stroke: #481; stroke-width: 2px; fill: none; marker-end: url("#arrowhead"); }
+.edge-path { stroke: #000; stroke-width: 4px; fill: none; marker-end: url("#arrowhead"); }
+.edge-path-float { stroke: #a52; stroke-width: 4px; fill: none; marker-end: url("#arrowhead"); }
+.edge-path-int { stroke: #481; stroke-width: 4px; fill: none; marker-end: url("#arrowhead"); }
 .edge-paths-hit-test { pointer-events: stroke; stroke-width: 0.5em; fill: none; stroke: #000; stroke-opacity: 0.001; }
 
 .select > .node.node-border { stroke: rgba(220, 0, 0, 0.9); stroke-width: 2px; }
