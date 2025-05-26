@@ -697,6 +697,9 @@ view.View = class {
             if (model.producer) {
                 format.push(`(${model.producer})`);
             }
+            if (model.metadata) {
+                format.push(model.metadata.quantized);
+            }
             if (format.length > 0) {
                 this._host.event('model_open', {
                     model_format: model.format || '',
@@ -3559,6 +3562,7 @@ view.TensorSidebar = class extends view.ObjectSidebar {
     }
 };
 
+
 view.ModelSidebar = class extends view.ObjectSidebar {
 
     constructor(context, model, graph, signature) {
@@ -3629,9 +3633,19 @@ view.ModelSidebar = class extends view.ObjectSidebar {
         if (Array.isArray(metadata) && metadata.length > 0) {
             this.addHeader('Metadata');
             for (const argument of metadata) {
-                this.addProperty(argument.name, argument.value);
+                if (Array.isArray(argument.value) && argument.value.length > 0) {
+                    for (const subargument of argument.value) {
+                        const keys = Object.keys(subargument);
+                        for (const key of keys){
+                            this.addProperty(key, subargument[key].toString());
+                        }
+                    }
+                } else {
+                    this.addProperty(argument.name, argument.value);
+                }
             }
         }
+
         const metrics = model.metrics;
         if (Array.isArray(metrics) && metrics.length > 0) {
             this.addHeader('Metrics');
@@ -5248,7 +5262,7 @@ metrics.Tensor = class {
             const keys = new Set(this._metrics.map((metrics) => metrics.name));
             const type = this._tensor.type;
             const shape = type.shape.dimensions;
-            const size = shape.reduce((a, b) => a * b, 1);
+            const size = shape.reduce((a, b) => BigInt(a) * BigInt(b), 1);
             if (size < 0x800000 &&
                 (type.dataType.startsWith('float') || type.dataType.startsWith('bfloat')) &&
                 (!keys.has('sparsity') || !keys.has('min') || !keys.has('max') && !keys.has('mean') || !keys.has('max') || !keys.has('std'))) {

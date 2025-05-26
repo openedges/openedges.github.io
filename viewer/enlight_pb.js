@@ -33,7 +33,15 @@ EnlightV2.Model = class {
         this.name = configuration && configuration.name || "";
         this.format = 'enlightV2';
         this.producer = 'Openedges Technology';
-        this.metadata = [];
+        //this.metadata = []
+        this.metadata = [
+            {name: "converted", value: container.metadata.converted},
+            {name: "quantized", value: container.metadata.quantized},
+            {name: "denorm_input", value: container.metadata.denorm_input},
+            {name: "norm", value: container.metadata.norm},
+            {name: "backend", value: container.metadata.backend},
+            {name: "model_ext", value: container.metadata.model_ext}
+        ]
     }
 
     static open(context) {
@@ -227,7 +235,7 @@ EnlightV2.Initializer = class {
 
     _decode(context) {
         const shape = context.shape;
-        let size = 1;
+        let size = BigInt(1);
         for (let i = 0; i < shape.length; i++) {
             size *= shape[i];
         }
@@ -312,6 +320,7 @@ EnlightProto.HeaderProto = class {
         this.sdk = '';
         this.version_major = '';
         this.version_minor = '';
+        this.version_patch = '';
         this.date = '';
         this.owner = '';
     }
@@ -351,10 +360,14 @@ EnlightProto.HeaderProto = class {
                     break;
                 }
                 case 6: {
-                    message.date = reader.string();
+                    message.version_patch = reader.string();
                     break;
                 }
                 case 7: {
+                    message.date = reader.string();
+                    break;
+                }
+                case 8: {
                     message.owner = reader.string();
                     break;
                 }
@@ -451,7 +464,7 @@ EnlightProto.NetworkHeaderProto = class {
 
     static decode(reader, length)  {
         const end = length === undefined ? reader.length : reader.position + length;
-        const message = new EnlightProto.Layer();
+        const message = new EnlightProto.NetworkHeaderProto();
         while (reader.position < end) {
             const tag = reader.uint32();
             const field = tag >>> 3;
@@ -474,6 +487,8 @@ EnlightProto.MetadataProto = class {
         this.denorm_input = false;
         this.norm = [];
         this.backend = '';
+        this.converted = false;
+        this.model_ext = '';
     }
 
     static decode(reader, length)  {
@@ -496,6 +511,12 @@ EnlightProto.MetadataProto = class {
                 }
                 case 4:
                     message.backend = reader.string();
+                    break;
+                case 5:
+                    message.converted = reader.bool();
+                    break;
+                case 6:
+                    message.model_ext = reader.string();
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -526,14 +547,14 @@ EnlightProto.NormInfoProto = class {
                     break;
                 case 2:
                     message.mean_shape = reader.array(message.mean_shape,
-                        () => reader.int32(), tag);
+                        () => BigInt(reader.int64()), tag);
                     break;
                 case 3:
                     message.std = reader.floats(message.std, tag);
                     break;
                 case 4:
                     message.std_shape = reader.array(message.std_shape,
-                        () => reader.int32(), tag);
+                        () => BigInt(reader.int64()), tag);
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -661,7 +682,7 @@ EnlightProto.Tensor = class {
                     break;
                 case 7:
                     message.shape = reader.array(message.shape,
-                        () => reader.int32(), tag);
+                        () => BigInt(reader.int64()), tag);
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -690,18 +711,23 @@ EnlightProto.Buffer = class {
             switch (field) {
                 case 1:
                     message.dataType = EnlightProto.getDataType(reader.uint32());
+                    console.log(message.dataType);
                     break;
                 case 2:
                     message.idx = reader.string();
+                    console.log(message.idx);
                     break;
                 case 3:
                     message.name = reader.string();
+                    console.log(message.name);
                     break;
                 case 4:
                     message.dsts.push(reader.string());
+                    console.log(message.dsts);
                     break;
                 case 5:
                     message.data  = reader.floats(message.data, tag);
+                    console.log(message.data);
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -766,7 +792,7 @@ EnlightProto.Attribute = class {
                     message.F = reader.float();
                     break;
                 case 4:
-                    message.I = reader.int32();
+                    message.I = BigInt(reader.int64());
                     break;
                 case 5:
                     message.S = reader.string();
@@ -779,7 +805,7 @@ EnlightProto.Attribute = class {
                     break;
                 case 8:
                     message.ints = reader.array(message.ints,
-                        () => reader.int32(), tag);
+                        () => BigInt(reader.int64()), tag);
                     break;
                 case 9:
                     message.strings = reader.array(message.strings,
