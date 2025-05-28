@@ -161,7 +161,8 @@ enlight.Container = class {
 
     async read() {
         this.format = 'enlight';
-        const buffer = this.context.stream._buffer;
+        const stream = this.context.stream;
+        const buffer = stream.read(stream.length);
         const byteBuffer = new flatbuffers.ByteBuffer(buffer);
         enlight.schema = enlight_schema.Enlight_Schema;
         const model = enlight_schema.Network.prototype.getRootAsNetwork(byteBuffer);
