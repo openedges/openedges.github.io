@@ -37,7 +37,7 @@ EnlightV2.Model = class {
         this.metadata = [
             {name: "converted", value: container.metadata.converted},
             {name: "quantized", value: container.metadata.quantized},
-            {name: "denorm_input", value: container.metadata.denorm_input},
+            //{name: "denorm_input", value: container.metadata.denorm_input}, // deprecated
             {name: "norm", value: container.metadata.norm},
             {name: "backend", value: container.metadata.backend},
             {name: "model_ext", value: container.metadata.model_ext}
@@ -73,6 +73,9 @@ EnlightV2.Graph = class {
             this.outputs.push(argument);
         }
         for (const layer of container.layers) {
+            if (layer.inference_only === true) {
+                continue; // skip inference only layers
+            }
             this.nodes.push(new EnlightV2.Node(layer, container));
         }
     }
@@ -165,8 +168,8 @@ EnlightV2.Argument = class {
 
 EnlightV2.Value = class {
     constructor(tensor, container) {
-        if (typeof name !== 'string') {
-            throw new EnlightV2.Error(`Invalid value identifier '${JSON.stringify(name)}'.`);
+        if (typeof tensor.idx !== 'string') {
+            throw new EnlightV2.Error(`Invalid value identifier '${JSON.stringify(tensor.idx)}'.`);
         }
         const buffer = container.buffers[tensor.src];
         const initializer = buffer ? new EnlightV2.Initializer(tensor, buffer) : null;
@@ -398,6 +401,8 @@ EnlightProto.NetworkProto = class {
         this.collectors = [];
         this.layers = [];
         this.metadata = {};
+        this.inputs_inference = [];
+        this.outputs_inference = [];
     }
 
     static decode(reader, length) {
@@ -448,6 +453,12 @@ EnlightProto.NetworkProto = class {
                     message.metadata = EnlightProto.MetadataProto.decode(reader, read_length);
                     break;
                 }
+                case 10:
+                    message.inputs_inference.push(reader.string());
+                    break;
+                case 11:
+                    message.outputs_inference.push(reader.string());
+                    break;
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -484,7 +495,7 @@ EnlightProto.NetworkHeaderProto = class {
 EnlightProto.MetadataProto = class {
     constructor() {
         this.quantized = false;
-        this.denorm_input = false;
+        //this.denorm_input = false; // deprecated
         this.norm = [];
         this.backend = '';
         this.converted = false;
@@ -501,9 +512,9 @@ EnlightProto.MetadataProto = class {
                 case 1:
                     message.quantized = reader.bool();
                     break;
-                case 2:
-                    message.denorm_input = reader.bool();
-                    break;
+                // case 2:
+                //     message.denorm_input = reader.bool(); // deprecated but idx is still alive
+                //     break;
                 case 3:{
                     const read_length = reader.uint32();
                     message.norm.push(EnlightProto.NormInfoProto.decode(reader, read_length));
@@ -574,6 +585,7 @@ EnlightProto.Layer = class {
         this.dsts = [];
         this.attributes = [];
         this.fusedLayers = [];
+        this.inference_only = false;
     }
 
     static decode(reader, length) {
@@ -620,6 +632,9 @@ EnlightProto.Layer = class {
                     );
                     break;
                 }
+                case 8:
+                    message.inference_only = reader.bool();
+                    break;
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -628,6 +643,42 @@ EnlightProto.Layer = class {
         return message;
     }
 };
+
+
+
+EnlightProto.Shape = class {
+    constructor() {
+        this.value = '';
+        this.symbol = '';
+    }
+
+    static decode(reader, length) {
+        const end = length === undefined ? reader.length : reader.position + length;
+        const message = new EnlightProto.Shape();
+        while (reader.position < end) {
+            const tag = reader.uint32();
+            const field = tag >>> 3;
+            switch (field) {
+                case 1: // int64 value
+                    message.value = BigInt(reader.int64());
+                    delete message.symbol;
+                    break;
+
+                case 2: // string symbol
+                    message.symbol = reader.string();
+                    delete message.value;
+                    break;
+
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message.value !== undefined ? message.value : message.symbol;
+    }
+}
+
+
 
 EnlightProto.Tensor = class {
     constructor() {
@@ -681,8 +732,10 @@ EnlightProto.Tensor = class {
                     message.dsts.push(reader.string());
                     break;
                 case 7:
-                    message.shape = reader.array(message.shape,
-                        () => BigInt(reader.int64()), tag);
+                    const read_length = reader.uint32();
+                    message.shape.push(EnlightProto.Shape.decode(reader, read_length));
+                    //message.shape = reader.array(message.shape,
+                    //    () => BigInt(reader.int64()), tag);
                     break;
                 default:
                     reader.skipType(tag & 7);
@@ -711,23 +764,55 @@ EnlightProto.Buffer = class {
             switch (field) {
                 case 1:
                     message.dataType = EnlightProto.getDataType(reader.uint32());
-                    console.log(message.dataType);
                     break;
                 case 2:
                     message.idx = reader.string();
-                    console.log(message.idx);
                     break;
                 case 3:
                     message.name = reader.string();
-                    console.log(message.name);
                     break;
                 case 4:
                     message.dsts.push(reader.string());
-                    console.log(message.dsts);
                     break;
                 case 5:
-                    message.data  = reader.floats(message.data, tag);
-                    console.log(message.data);
+                    const rawData = reader.bytes();
+                    switch (message.dataType) {
+                        case 'int64':
+                            message.data = new BigInt64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
+                            break;
+                        case 'uint64':
+                            message.data = new BigUint64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
+                            break;                        
+                        case 'float64':
+                            message.data = new Float64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
+                            break;
+                        case 'float32':
+                            message.data = new Float32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
+                            break;
+                        case 'uint8':
+                            message.data = new Uint8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
+                            break;
+                        case 'int8':
+                            message.data = new Int8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
+                            break;
+                        case 'uint16':
+                            message.data = new Uint16Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 2);
+                            break;
+                        case 'int16':
+                            message.data = new Int16Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 2);
+                            break;
+                        case 'uint32':
+                            message.data = new Uint32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
+                            break;
+                        case 'int32':
+                            message.data = new Int32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
+                            break;                    
+                        case 'bool':
+                            message.data = new Uint8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
+                            break;
+                        default:
+                            throw new Error(`Unsupported dataType '${message.dataType}' in EnlightProto.Buffer.decode.`);
+                    }
                     break;
                 default:
                     reader.skipType(tag & 7);

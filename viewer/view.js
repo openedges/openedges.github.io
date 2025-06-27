@@ -3629,15 +3629,18 @@ view.ModelSidebar = class extends view.ObjectSidebar {
             selector.on('change', (sender, data) => this.emit('update-active-graph-signature', data));
             this.addEntry('signature', selector);
         }
+
         const metadata = model.metadata;
         if (Array.isArray(metadata) && metadata.length > 0) {
             this.addHeader('Metadata');
             for (const argument of metadata) {
-                if (Array.isArray(argument.value) && argument.value.length > 0) {
-                    for (const subargument of argument.value) {
-                        const keys = Object.keys(subargument);
-                        for (const key of keys){
-                            this.addProperty(key, subargument[key].toString());
+                if (Array.isArray(argument.value)) {
+                    if (argument.value.length > 0){
+                        for (const subargument of argument.value) {
+                            const keys = Object.keys(subargument);
+                            for (const key of keys){
+                                this.addProperty(argument.name + "_" + key, subargument[key].toString());
+                            }
                         }
                     }
                 } else {
