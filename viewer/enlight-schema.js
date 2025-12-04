@@ -261,7 +261,9 @@ enlight_schema.Layer = {
   PowLayer: 54,
   MishAttentionLayer: 55,
   AddConstLayer: 56,
-  SqueezeLayer: 57
+  SqueezeLayer: 57,
+  GeluLayer: 58,
+  GeluAttentionLayer: 59
 };
 
 /**
@@ -325,7 +327,29 @@ enlight_schema.LayerName = {
   '54': 'PowLayer',
   '55': 'MishAttentionLayer',
   '56': 'AddConstLayer',
-  '57': 'SqueezeLayer'
+  '57': 'SqueezeLayer',
+  '58': 'GeluLayer',
+  '59': 'GeluAttentionLayer'
+};
+
+/**
+ * @enum {number}
+ */
+enlight_schema.DynamicTypeValue = {
+  NONE: 0,
+  StringValue: 1,
+  FloatValue: 2,
+  DictValue: 3
+};
+
+/**
+ * @enum {string}
+ */
+enlight_schema.DynamicTypeValueName = {
+  '0': 'NONE',
+  '1': 'StringValue',
+  '2': 'FloatValue',
+  '3': 'DictValue'
 };
 
 /**
@@ -3624,10 +3648,27 @@ enlight_schema.HardSigmoidLayer.getSizePrefixedRootAsHardSigmoidLayer = function
 };
 
 /**
+ * @param {enlight_schema.HardSigmoidDescriptor=} obj
+ * @returns {enlight_schema.HardSigmoidDescriptor|null}
+ */
+enlight_schema.HardSigmoidLayer.prototype.descriptor = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? (obj || new enlight_schema.HardSigmoidDescriptor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
 enlight_schema.HardSigmoidLayer.startHardSigmoidLayer = function(builder) {
-  builder.startObject(0);
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} descriptorOffset
+ */
+enlight_schema.HardSigmoidLayer.addDescriptor = function(builder, descriptorOffset) {
+  builder.addFieldOffset(0, descriptorOffset, 0);
 };
 
 /**
@@ -3641,11 +3682,118 @@ enlight_schema.HardSigmoidLayer.endHardSigmoidLayer = function(builder) {
 
 /**
  * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} descriptorOffset
  * @returns {flatbuffers.Offset}
  */
-enlight_schema.HardSigmoidLayer.createHardSigmoidLayer = function(builder) {
+enlight_schema.HardSigmoidLayer.createHardSigmoidLayer = function(builder, descriptorOffset) {
   enlight_schema.HardSigmoidLayer.startHardSigmoidLayer(builder);
+  enlight_schema.HardSigmoidLayer.addDescriptor(builder, descriptorOffset);
   return enlight_schema.HardSigmoidLayer.endHardSigmoidLayer(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.HardSigmoidDescriptor = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.HardSigmoidDescriptor}
+ */
+enlight_schema.HardSigmoidDescriptor.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.HardSigmoidDescriptor=} obj
+ * @returns {enlight_schema.HardSigmoidDescriptor}
+ */
+enlight_schema.HardSigmoidDescriptor.getRootAsHardSigmoidDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.HardSigmoidDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.HardSigmoidDescriptor=} obj
+ * @returns {enlight_schema.HardSigmoidDescriptor}
+ */
+enlight_schema.HardSigmoidDescriptor.getSizePrefixedRootAsHardSigmoidDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.HardSigmoidDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.HardSigmoidDescriptor.prototype.alpha = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.HardSigmoidDescriptor.prototype.beta = function() {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.HardSigmoidDescriptor.startHardSigmoidDescriptor = function(builder) {
+  builder.startObject(2);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} alpha
+ */
+enlight_schema.HardSigmoidDescriptor.addAlpha = function(builder, alpha) {
+  builder.addFieldFloat32(0, alpha, 0.0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} beta
+ */
+enlight_schema.HardSigmoidDescriptor.addBeta = function(builder, beta) {
+  builder.addFieldFloat32(1, beta, 0.0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.HardSigmoidDescriptor.endHardSigmoidDescriptor = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} alpha
+ * @param {number} beta
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.HardSigmoidDescriptor.createHardSigmoidDescriptor = function(builder, alpha, beta) {
+  enlight_schema.HardSigmoidDescriptor.startHardSigmoidDescriptor(builder);
+  enlight_schema.HardSigmoidDescriptor.addAlpha(builder, alpha);
+  enlight_schema.HardSigmoidDescriptor.addBeta(builder, beta);
+  return enlight_schema.HardSigmoidDescriptor.endHardSigmoidDescriptor(builder);
 }
 
 /**
@@ -3922,6 +4070,358 @@ enlight_schema.MishAttentionLayer.endMishAttentionLayer = function(builder) {
 enlight_schema.MishAttentionLayer.createMishAttentionLayer = function(builder) {
   enlight_schema.MishAttentionLayer.startMishAttentionLayer(builder);
   return enlight_schema.MishAttentionLayer.endMishAttentionLayer(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.GeluLayer = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.GeluLayer}
+ */
+enlight_schema.GeluLayer.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluLayer=} obj
+ * @returns {enlight_schema.GeluLayer}
+ */
+enlight_schema.GeluLayer.getRootAsGeluLayer = function(bb, obj) {
+  return (obj || new enlight_schema.GeluLayer).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluLayer=} obj
+ * @returns {enlight_schema.GeluLayer}
+ */
+enlight_schema.GeluLayer.getSizePrefixedRootAsGeluLayer = function(bb, obj) {
+  return (obj || new enlight_schema.GeluLayer).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {enlight_schema.GeluDescriptor=} obj
+ * @returns {enlight_schema.GeluDescriptor|null}
+ */
+enlight_schema.GeluLayer.prototype.descriptor = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? (obj || new enlight_schema.GeluDescriptor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.GeluLayer.startGeluLayer = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} descriptorOffset
+ */
+enlight_schema.GeluLayer.addDescriptor = function(builder, descriptorOffset) {
+  builder.addFieldOffset(0, descriptorOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluLayer.endGeluLayer = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} descriptorOffset
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluLayer.createGeluLayer = function(builder, descriptorOffset) {
+  enlight_schema.GeluLayer.startGeluLayer(builder);
+  enlight_schema.GeluLayer.addDescriptor(builder, descriptorOffset);
+  return enlight_schema.GeluLayer.endGeluLayer(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.GeluAttentionLayer = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.GeluAttentionLayer}
+ */
+enlight_schema.GeluAttentionLayer.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluAttentionLayer=} obj
+ * @returns {enlight_schema.GeluAttentionLayer}
+ */
+enlight_schema.GeluAttentionLayer.getRootAsGeluAttentionLayer = function(bb, obj) {
+  return (obj || new enlight_schema.GeluAttentionLayer).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluAttentionLayer=} obj
+ * @returns {enlight_schema.GeluAttentionLayer}
+ */
+enlight_schema.GeluAttentionLayer.getSizePrefixedRootAsGeluAttentionLayer = function(bb, obj) {
+  return (obj || new enlight_schema.GeluAttentionLayer).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {enlight_schema.GeluAttentionDescriptor=} obj
+ * @returns {enlight_schema.GeluAttentionDescriptor|null}
+ */
+enlight_schema.GeluAttentionLayer.prototype.descriptor = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? (obj || new enlight_schema.GeluAttentionDescriptor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.GeluAttentionLayer.startGeluAttentionLayer = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} descriptorOffset
+ */
+enlight_schema.GeluAttentionLayer.addDescriptor = function(builder, descriptorOffset) {
+  builder.addFieldOffset(0, descriptorOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluAttentionLayer.endGeluAttentionLayer = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} descriptorOffset
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluAttentionLayer.createGeluAttentionLayer = function(builder, descriptorOffset) {
+  enlight_schema.GeluAttentionLayer.startGeluAttentionLayer(builder);
+  enlight_schema.GeluAttentionLayer.addDescriptor(builder, descriptorOffset);
+  return enlight_schema.GeluAttentionLayer.endGeluAttentionLayer(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.GeluDescriptor = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.GeluDescriptor}
+ */
+enlight_schema.GeluDescriptor.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluDescriptor=} obj
+ * @returns {enlight_schema.GeluDescriptor}
+ */
+enlight_schema.GeluDescriptor.getRootAsGeluDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.GeluDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluDescriptor=} obj
+ * @returns {enlight_schema.GeluDescriptor}
+ */
+enlight_schema.GeluDescriptor.getSizePrefixedRootAsGeluDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.GeluDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+enlight_schema.GeluDescriptor.prototype.approximate = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.GeluDescriptor.startGeluDescriptor = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} approximateOffset
+ */
+enlight_schema.GeluDescriptor.addApproximate = function(builder, approximateOffset) {
+  builder.addFieldOffset(0, approximateOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluDescriptor.endGeluDescriptor = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} approximateOffset
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluDescriptor.createGeluDescriptor = function(builder, approximateOffset) {
+  enlight_schema.GeluDescriptor.startGeluDescriptor(builder);
+  enlight_schema.GeluDescriptor.addApproximate(builder, approximateOffset);
+  return enlight_schema.GeluDescriptor.endGeluDescriptor(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.GeluAttentionDescriptor = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.GeluAttentionDescriptor}
+ */
+enlight_schema.GeluAttentionDescriptor.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluAttentionDescriptor=} obj
+ * @returns {enlight_schema.GeluAttentionDescriptor}
+ */
+enlight_schema.GeluAttentionDescriptor.getRootAsGeluAttentionDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.GeluAttentionDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.GeluAttentionDescriptor=} obj
+ * @returns {enlight_schema.GeluAttentionDescriptor}
+ */
+enlight_schema.GeluAttentionDescriptor.getSizePrefixedRootAsGeluAttentionDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.GeluAttentionDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+enlight_schema.GeluAttentionDescriptor.prototype.approximate = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.GeluAttentionDescriptor.startGeluAttentionDescriptor = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} approximateOffset
+ */
+enlight_schema.GeluAttentionDescriptor.addApproximate = function(builder, approximateOffset) {
+  builder.addFieldOffset(0, approximateOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluAttentionDescriptor.endGeluAttentionDescriptor = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} approximateOffset
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.GeluAttentionDescriptor.createGeluAttentionDescriptor = function(builder, approximateOffset) {
+  enlight_schema.GeluAttentionDescriptor.startGeluAttentionDescriptor(builder);
+  enlight_schema.GeluAttentionDescriptor.addApproximate(builder, approximateOffset);
+  return enlight_schema.GeluAttentionDescriptor.endGeluAttentionDescriptor(builder);
 }
 
 /**
@@ -4983,10 +5483,19 @@ enlight_schema.Conv2dDescriptor.prototype.groups = function() {
 };
 
 /**
+ * @param {enlight_schema.QuantizationBitDescriptor=} obj
+ * @returns {enlight_schema.QuantizationBitDescriptor|null}
+ */
+enlight_schema.Conv2dDescriptor.prototype.quantizationBitInfo = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 34);
+  return offset ? (obj || new enlight_schema.QuantizationBitDescriptor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
 enlight_schema.Conv2dDescriptor.startConv2dDescriptor = function(builder) {
-  builder.startObject(15);
+  builder.startObject(16);
 };
 
 /**
@@ -5111,6 +5620,14 @@ enlight_schema.Conv2dDescriptor.addGroups = function(builder, groups) {
 
 /**
  * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} quantizationBitInfoOffset
+ */
+enlight_schema.Conv2dDescriptor.addQuantizationBitInfo = function(builder, quantizationBitInfoOffset) {
+  builder.addFieldOffset(15, quantizationBitInfoOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
 enlight_schema.Conv2dDescriptor.endConv2dDescriptor = function(builder) {
@@ -5135,9 +5652,10 @@ enlight_schema.Conv2dDescriptor.endConv2dDescriptor = function(builder) {
  * @param {number} quantizedBitwidth
  * @param {boolean} existBitConverter
  * @param {number} groups
+ * @param {flatbuffers.Offset} quantizationBitInfoOffset
  * @returns {flatbuffers.Offset}
  */
-enlight_schema.Conv2dDescriptor.createConv2dDescriptor = function(builder, inChannels, outChannels, kernelWidth, kernelHeight, padWidth, padHeight, strideX, strideY, dilationX, dilationY, biasEnabled, dataLayout, quantizedBitwidth, existBitConverter, groups) {
+enlight_schema.Conv2dDescriptor.createConv2dDescriptor = function(builder, inChannels, outChannels, kernelWidth, kernelHeight, padWidth, padHeight, strideX, strideY, dilationX, dilationY, biasEnabled, dataLayout, quantizedBitwidth, existBitConverter, groups, quantizationBitInfoOffset) {
   enlight_schema.Conv2dDescriptor.startConv2dDescriptor(builder);
   enlight_schema.Conv2dDescriptor.addInChannels(builder, inChannels);
   enlight_schema.Conv2dDescriptor.addOutChannels(builder, outChannels);
@@ -5154,7 +5672,149 @@ enlight_schema.Conv2dDescriptor.createConv2dDescriptor = function(builder, inCha
   enlight_schema.Conv2dDescriptor.addQuantizedBitwidth(builder, quantizedBitwidth);
   enlight_schema.Conv2dDescriptor.addExistBitConverter(builder, existBitConverter);
   enlight_schema.Conv2dDescriptor.addGroups(builder, groups);
+  enlight_schema.Conv2dDescriptor.addQuantizationBitInfo(builder, quantizationBitInfoOffset);
   return enlight_schema.Conv2dDescriptor.endConv2dDescriptor(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.QuantizationBitDescriptor = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.QuantizationBitDescriptor}
+ */
+enlight_schema.QuantizationBitDescriptor.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.QuantizationBitDescriptor=} obj
+ * @returns {enlight_schema.QuantizationBitDescriptor}
+ */
+enlight_schema.QuantizationBitDescriptor.getRootAsQuantizationBitDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.QuantizationBitDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.QuantizationBitDescriptor=} obj
+ * @returns {enlight_schema.QuantizationBitDescriptor}
+ */
+enlight_schema.QuantizationBitDescriptor.getSizePrefixedRootAsQuantizationBitDescriptor = function(bb, obj) {
+  return (obj || new enlight_schema.QuantizationBitDescriptor).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.QuantizationBitDescriptor.prototype.bitwidthAct = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readUint32(this.bb_pos + offset) : 8;
+};
+
+/**
+ * @returns {boolean}
+ */
+enlight_schema.QuantizationBitDescriptor.prototype.signedAct = function() {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? !!this.bb.readInt8(this.bb_pos + offset) : true;
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.QuantizationBitDescriptor.prototype.bitwidthWeight = function() {
+  var offset = this.bb.__offset(this.bb_pos, 8);
+  return offset ? this.bb.readUint32(this.bb_pos + offset) : 8;
+};
+
+/**
+ * @returns {boolean}
+ */
+enlight_schema.QuantizationBitDescriptor.prototype.signedWeight = function() {
+  var offset = this.bb.__offset(this.bb_pos, 10);
+  return offset ? !!this.bb.readInt8(this.bb_pos + offset) : true;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.QuantizationBitDescriptor.startQuantizationBitDescriptor = function(builder) {
+  builder.startObject(4);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} bitwidthAct
+ */
+enlight_schema.QuantizationBitDescriptor.addBitwidthAct = function(builder, bitwidthAct) {
+  builder.addFieldInt32(0, bitwidthAct, 8);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {boolean} signedAct
+ */
+enlight_schema.QuantizationBitDescriptor.addSignedAct = function(builder, signedAct) {
+  builder.addFieldInt8(1, +signedAct, +true);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} bitwidthWeight
+ */
+enlight_schema.QuantizationBitDescriptor.addBitwidthWeight = function(builder, bitwidthWeight) {
+  builder.addFieldInt32(2, bitwidthWeight, 8);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {boolean} signedWeight
+ */
+enlight_schema.QuantizationBitDescriptor.addSignedWeight = function(builder, signedWeight) {
+  builder.addFieldInt8(3, +signedWeight, +true);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.QuantizationBitDescriptor.endQuantizationBitDescriptor = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} bitwidthAct
+ * @param {boolean} signedAct
+ * @param {number} bitwidthWeight
+ * @param {boolean} signedWeight
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.QuantizationBitDescriptor.createQuantizationBitDescriptor = function(builder, bitwidthAct, signedAct, bitwidthWeight, signedWeight) {
+  enlight_schema.QuantizationBitDescriptor.startQuantizationBitDescriptor(builder);
+  enlight_schema.QuantizationBitDescriptor.addBitwidthAct(builder, bitwidthAct);
+  enlight_schema.QuantizationBitDescriptor.addSignedAct(builder, signedAct);
+  enlight_schema.QuantizationBitDescriptor.addBitwidthWeight(builder, bitwidthWeight);
+  enlight_schema.QuantizationBitDescriptor.addSignedWeight(builder, signedWeight);
+  return enlight_schema.QuantizationBitDescriptor.endQuantizationBitDescriptor(builder);
 }
 
 /**
@@ -6778,10 +7438,18 @@ enlight_schema.Pool2dDescriptor.prototype.enableRound = function() {
 };
 
 /**
+ * @returns {boolean}
+ */
+enlight_schema.Pool2dDescriptor.prototype.countIncludePad = function() {
+  var offset = this.bb.__offset(this.bb_pos, 28);
+  return offset ? !!this.bb.readInt8(this.bb_pos + offset) : true;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
 enlight_schema.Pool2dDescriptor.startPool2dDescriptor = function(builder) {
-  builder.startObject(12);
+  builder.startObject(13);
 };
 
 /**
@@ -6882,6 +7550,14 @@ enlight_schema.Pool2dDescriptor.addEnableRound = function(builder, enableRound) 
 
 /**
  * @param {flatbuffers.Builder} builder
+ * @param {boolean} countIncludePad
+ */
+enlight_schema.Pool2dDescriptor.addCountIncludePad = function(builder, countIncludePad) {
+  builder.addFieldInt8(12, +countIncludePad, +true);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
 enlight_schema.Pool2dDescriptor.endPool2dDescriptor = function(builder) {
@@ -6903,9 +7579,10 @@ enlight_schema.Pool2dDescriptor.endPool2dDescriptor = function(builder) {
  * @param {enlight_schema.PaddingMethod} paddingMethod
  * @param {enlight_schema.DataLayout} dataLayout
  * @param {boolean} enableRound
+ * @param {boolean} countIncludePad
  * @returns {flatbuffers.Offset}
  */
-enlight_schema.Pool2dDescriptor.createPool2dDescriptor = function(builder, padWidth, padHeight, poolWidth, poolHeight, strideX, strideY, dilationX, dilationY, ceilMode, paddingMethod, dataLayout, enableRound) {
+enlight_schema.Pool2dDescriptor.createPool2dDescriptor = function(builder, padWidth, padHeight, poolWidth, poolHeight, strideX, strideY, dilationX, dilationY, ceilMode, paddingMethod, dataLayout, enableRound, countIncludePad) {
   enlight_schema.Pool2dDescriptor.startPool2dDescriptor(builder);
   enlight_schema.Pool2dDescriptor.addPadWidth(builder, padWidth);
   enlight_schema.Pool2dDescriptor.addPadHeight(builder, padHeight);
@@ -6919,6 +7596,7 @@ enlight_schema.Pool2dDescriptor.createPool2dDescriptor = function(builder, padWi
   enlight_schema.Pool2dDescriptor.addPaddingMethod(builder, paddingMethod);
   enlight_schema.Pool2dDescriptor.addDataLayout(builder, dataLayout);
   enlight_schema.Pool2dDescriptor.addEnableRound(builder, enableRound);
+  enlight_schema.Pool2dDescriptor.addCountIncludePad(builder, countIncludePad);
   return enlight_schema.Pool2dDescriptor.endPool2dDescriptor(builder);
 }
 
@@ -8932,10 +9610,46 @@ enlight_schema.YoloPostProcessLayer.prototype.descriptor = function(obj) {
 };
 
 /**
+ * @param {enlight_schema.ConstTensor=} obj
+ * @returns {enlight_schema.ConstTensor|null}
+ */
+enlight_schema.YoloPostProcessLayer.prototype.anchors = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? (obj || new enlight_schema.ConstTensor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
+ * @param {number} index
+ * @param {enlight_schema.ConstTensor=} obj
+ * @returns {enlight_schema.ConstTensor}
+ */
+enlight_schema.YoloPostProcessLayer.prototype.anchorBoxes = function(index, obj) {
+  var offset = this.bb.__offset(this.bb_pos, 8);
+  return offset ? (obj || new enlight_schema.ConstTensor).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.YoloPostProcessLayer.prototype.anchorBoxesLength = function() {
+  var offset = this.bb.__offset(this.bb_pos, 8);
+  return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param {enlight_schema.ConstTensor=} obj
+ * @returns {enlight_schema.ConstTensor|null}
+ */
+enlight_schema.YoloPostProcessLayer.prototype.numGrid = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 10);
+  return offset ? (obj || new enlight_schema.ConstTensor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
 enlight_schema.YoloPostProcessLayer.startYoloPostProcessLayer = function(builder) {
-  builder.startObject(1);
+  builder.startObject(4);
 };
 
 /**
@@ -8944,6 +9658,51 @@ enlight_schema.YoloPostProcessLayer.startYoloPostProcessLayer = function(builder
  */
 enlight_schema.YoloPostProcessLayer.addDescriptor = function(builder, descriptorOffset) {
   builder.addFieldOffset(0, descriptorOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} anchorsOffset
+ */
+enlight_schema.YoloPostProcessLayer.addAnchors = function(builder, anchorsOffset) {
+  builder.addFieldOffset(1, anchorsOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} anchorBoxesOffset
+ */
+enlight_schema.YoloPostProcessLayer.addAnchorBoxes = function(builder, anchorBoxesOffset) {
+  builder.addFieldOffset(2, anchorBoxesOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {Array.<flatbuffers.Offset>} data
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.YoloPostProcessLayer.createAnchorBoxesVector = function(builder, data) {
+  builder.startVector(4, data.length, 4);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} numElems
+ */
+enlight_schema.YoloPostProcessLayer.startAnchorBoxesVector = function(builder, numElems) {
+  builder.startVector(4, numElems, 4);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} numGridOffset
+ */
+enlight_schema.YoloPostProcessLayer.addNumGrid = function(builder, numGridOffset) {
+  builder.addFieldOffset(3, numGridOffset, 0);
 };
 
 /**
@@ -8958,11 +9717,17 @@ enlight_schema.YoloPostProcessLayer.endYoloPostProcessLayer = function(builder) 
 /**
  * @param {flatbuffers.Builder} builder
  * @param {flatbuffers.Offset} descriptorOffset
+ * @param {flatbuffers.Offset} anchorsOffset
+ * @param {flatbuffers.Offset} anchorBoxesOffset
+ * @param {flatbuffers.Offset} numGridOffset
  * @returns {flatbuffers.Offset}
  */
-enlight_schema.YoloPostProcessLayer.createYoloPostProcessLayer = function(builder, descriptorOffset) {
+enlight_schema.YoloPostProcessLayer.createYoloPostProcessLayer = function(builder, descriptorOffset, anchorsOffset, anchorBoxesOffset, numGridOffset) {
   enlight_schema.YoloPostProcessLayer.startYoloPostProcessLayer(builder);
   enlight_schema.YoloPostProcessLayer.addDescriptor(builder, descriptorOffset);
+  enlight_schema.YoloPostProcessLayer.addAnchors(builder, anchorsOffset);
+  enlight_schema.YoloPostProcessLayer.addAnchorBoxes(builder, anchorBoxesOffset);
+  enlight_schema.YoloPostProcessLayer.addNumGrid(builder, numGridOffset);
   return enlight_schema.YoloPostProcessLayer.endYoloPostProcessLayer(builder);
 }
 
@@ -9035,19 +9800,10 @@ enlight_schema.YoloPostProcessDescriptor.prototype.backgroundEnabled = function(
 };
 
 /**
- * @param {enlight_schema.ConstTensor=} obj
- * @returns {enlight_schema.ConstTensor|null}
- */
-enlight_schema.YoloPostProcessDescriptor.prototype.anchors = function(obj) {
-  var offset = this.bb.__offset(this.bb_pos, 10);
-  return offset ? (obj || new enlight_schema.ConstTensor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
-};
-
-/**
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.nmsScoreThreshold = function() {
-  var offset = this.bb.__offset(this.bb_pos, 12);
+  var offset = this.bb.__offset(this.bb_pos, 10);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.6;
 };
 
@@ -9055,7 +9811,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.nmsScoreThreshold = function(
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.nmsIouThreshold = function() {
-  var offset = this.bb.__offset(this.bb_pos, 14);
+  var offset = this.bb.__offset(this.bb_pos, 12);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.45;
 };
 
@@ -9063,7 +9819,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.nmsIouThreshold = function() 
  * @returns {boolean}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.isquantized = function() {
-  var offset = this.bb.__offset(this.bb_pos, 16);
+  var offset = this.bb.__offset(this.bb_pos, 14);
   return offset ? !!this.bb.readInt8(this.bb_pos + offset) : false;
 };
 
@@ -9072,42 +9828,15 @@ enlight_schema.YoloPostProcessDescriptor.prototype.isquantized = function() {
  * @returns {string|Uint8Array|null}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.type = function(optionalEncoding) {
-  var offset = this.bb.__offset(this.bb_pos, 18);
+  var offset = this.bb.__offset(this.bb_pos, 16);
   return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
-};
-
-/**
- * @param {number} index
- * @param {enlight_schema.ConstTensor=} obj
- * @returns {enlight_schema.ConstTensor}
- */
-enlight_schema.YoloPostProcessDescriptor.prototype.anchorBoxes = function(index, obj) {
-  var offset = this.bb.__offset(this.bb_pos, 20);
-  return offset ? (obj || new enlight_schema.ConstTensor).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
-};
-
-/**
- * @returns {number}
- */
-enlight_schema.YoloPostProcessDescriptor.prototype.anchorBoxesLength = function() {
-  var offset = this.bb.__offset(this.bb_pos, 20);
-  return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
-};
-
-/**
- * @param {enlight_schema.ConstTensor=} obj
- * @returns {enlight_schema.ConstTensor|null}
- */
-enlight_schema.YoloPostProcessDescriptor.prototype.numGrid = function(obj) {
-  var offset = this.bb.__offset(this.bb_pos, 22);
-  return offset ? (obj || new enlight_schema.ConstTensor).__init(this.bb.__indirect(this.bb_pos + offset), this.bb) : null;
 };
 
 /**
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.numAnchor = function() {
-  var offset = this.bb.__offset(this.bb_pos, 24);
+  var offset = this.bb.__offset(this.bb_pos, 18);
   return offset ? this.bb.readUint32(this.bb_pos + offset) : 0;
 };
 
@@ -9116,7 +9845,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.numAnchor = function() {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.outputTensorScales = function(index) {
-  var offset = this.bb.__offset(this.bb_pos, 26);
+  var offset = this.bb.__offset(this.bb_pos, 20);
   return offset ? this.bb.readFloat32(this.bb.__vector(this.bb_pos + offset) + index * 4) : 0;
 };
 
@@ -9124,7 +9853,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.outputTensorScales = function
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.outputTensorScalesLength = function() {
-  var offset = this.bb.__offset(this.bb_pos, 26);
+  var offset = this.bb.__offset(this.bb_pos, 20);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -9132,7 +9861,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.outputTensorScalesLength = fu
  * @returns {Float32Array}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.outputTensorScalesArray = function() {
-  var offset = this.bb.__offset(this.bb_pos, 26);
+  var offset = this.bb.__offset(this.bb_pos, 20);
   return offset ? new Float32Array(this.bb.bytes().buffer, this.bb.bytes().byteOffset + this.bb.__vector(this.bb_pos + offset), this.bb.__vector_len(this.bb_pos + offset)) : null;
 };
 
@@ -9141,7 +9870,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.outputTensorScalesArray = fun
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.imgSize = function(index) {
-  var offset = this.bb.__offset(this.bb_pos, 28);
+  var offset = this.bb.__offset(this.bb_pos, 22);
   return offset ? this.bb.readUint32(this.bb.__vector(this.bb_pos + offset) + index * 4) : 0;
 };
 
@@ -9149,7 +9878,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.imgSize = function(index) {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.imgSizeLength = function() {
-  var offset = this.bb.__offset(this.bb_pos, 28);
+  var offset = this.bb.__offset(this.bb_pos, 22);
   return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
 };
 
@@ -9157,7 +9886,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.imgSizeLength = function() {
  * @returns {Uint32Array}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.imgSizeArray = function() {
-  var offset = this.bb.__offset(this.bb_pos, 28);
+  var offset = this.bb.__offset(this.bb_pos, 22);
   return offset ? new Uint32Array(this.bb.bytes().buffer, this.bb.bytes().byteOffset + this.bb.__vector(this.bb_pos + offset), this.bb.__vector_len(this.bb_pos + offset)) : null;
 };
 
@@ -9165,7 +9894,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.imgSizeArray = function() {
  * @returns {boolean}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.isSrcTensorDivided = function() {
-  var offset = this.bb.__offset(this.bb_pos, 30);
+  var offset = this.bb.__offset(this.bb_pos, 24);
   return offset ? !!this.bb.readInt8(this.bb_pos + offset) : false;
 };
 
@@ -9173,7 +9902,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.isSrcTensorDivided = function
  * @returns {boolean}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.processSigmoid = function() {
-  var offset = this.bb.__offset(this.bb_pos, 32);
+  var offset = this.bb.__offset(this.bb_pos, 26);
   return offset ? !!this.bb.readInt8(this.bb_pos + offset) : true;
 };
 
@@ -9181,7 +9910,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.processSigmoid = function() {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.OutScoreScale = function() {
-  var offset = this.bb.__offset(this.bb_pos, 34);
+  var offset = this.bb.__offset(this.bb_pos, 28);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
 };
 
@@ -9189,7 +9918,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.OutScoreScale = function() {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.OutBoxScale = function() {
-  var offset = this.bb.__offset(this.bb_pos, 36);
+  var offset = this.bb.__offset(this.bb_pos, 30);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
 };
 
@@ -9197,7 +9926,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.OutBoxScale = function() {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.ExpTableScale = function() {
-  var offset = this.bb.__offset(this.bb_pos, 38);
+  var offset = this.bb.__offset(this.bb_pos, 32);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
 };
 
@@ -9205,7 +9934,7 @@ enlight_schema.YoloPostProcessDescriptor.prototype.ExpTableScale = function() {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.SigTableScale = function() {
-  var offset = this.bb.__offset(this.bb_pos, 40);
+  var offset = this.bb.__offset(this.bb_pos, 34);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
 };
 
@@ -9213,15 +9942,23 @@ enlight_schema.YoloPostProcessDescriptor.prototype.SigTableScale = function() {
  * @returns {number}
  */
 enlight_schema.YoloPostProcessDescriptor.prototype.SoftmaxScale = function() {
-  var offset = this.bb.__offset(this.bb_pos, 42);
+  var offset = this.bb.__offset(this.bb_pos, 36);
   return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.YoloPostProcessDescriptor.prototype.dflRegMax = function() {
+  var offset = this.bb.__offset(this.bb_pos, 38);
+  return offset ? this.bb.readInt32(this.bb_pos + offset) : 0;
 };
 
 /**
  * @param {flatbuffers.Builder} builder
  */
 enlight_schema.YoloPostProcessDescriptor.startYoloPostProcessDescriptor = function(builder) {
-  builder.startObject(20);
+  builder.startObject(18);
 };
 
 /**
@@ -9250,18 +9987,10 @@ enlight_schema.YoloPostProcessDescriptor.addBackgroundEnabled = function(builder
 
 /**
  * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} anchorsOffset
- */
-enlight_schema.YoloPostProcessDescriptor.addAnchors = function(builder, anchorsOffset) {
-  builder.addFieldOffset(3, anchorsOffset, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
  * @param {number} nmsScoreThreshold
  */
 enlight_schema.YoloPostProcessDescriptor.addNmsScoreThreshold = function(builder, nmsScoreThreshold) {
-  builder.addFieldFloat32(4, nmsScoreThreshold, 0.6);
+  builder.addFieldFloat32(3, nmsScoreThreshold, 0.6);
 };
 
 /**
@@ -9269,7 +9998,7 @@ enlight_schema.YoloPostProcessDescriptor.addNmsScoreThreshold = function(builder
  * @param {number} nmsIouThreshold
  */
 enlight_schema.YoloPostProcessDescriptor.addNmsIouThreshold = function(builder, nmsIouThreshold) {
-  builder.addFieldFloat32(5, nmsIouThreshold, 0.45);
+  builder.addFieldFloat32(4, nmsIouThreshold, 0.45);
 };
 
 /**
@@ -9277,7 +10006,7 @@ enlight_schema.YoloPostProcessDescriptor.addNmsIouThreshold = function(builder, 
  * @param {boolean} isquantized
  */
 enlight_schema.YoloPostProcessDescriptor.addIsquantized = function(builder, isquantized) {
-  builder.addFieldInt8(6, +isquantized, +false);
+  builder.addFieldInt8(5, +isquantized, +false);
 };
 
 /**
@@ -9285,44 +10014,7 @@ enlight_schema.YoloPostProcessDescriptor.addIsquantized = function(builder, isqu
  * @param {flatbuffers.Offset} typeOffset
  */
 enlight_schema.YoloPostProcessDescriptor.addType = function(builder, typeOffset) {
-  builder.addFieldOffset(7, typeOffset, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} anchorBoxesOffset
- */
-enlight_schema.YoloPostProcessDescriptor.addAnchorBoxes = function(builder, anchorBoxesOffset) {
-  builder.addFieldOffset(8, anchorBoxesOffset, 0);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {Array.<flatbuffers.Offset>} data
- * @returns {flatbuffers.Offset}
- */
-enlight_schema.YoloPostProcessDescriptor.createAnchorBoxesVector = function(builder, data) {
-  builder.startVector(4, data.length, 4);
-  for (var i = data.length - 1; i >= 0; i--) {
-    builder.addOffset(data[i]);
-  }
-  return builder.endVector();
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {number} numElems
- */
-enlight_schema.YoloPostProcessDescriptor.startAnchorBoxesVector = function(builder, numElems) {
-  builder.startVector(4, numElems, 4);
-};
-
-/**
- * @param {flatbuffers.Builder} builder
- * @param {flatbuffers.Offset} numGridOffset
- */
-enlight_schema.YoloPostProcessDescriptor.addNumGrid = function(builder, numGridOffset) {
-  builder.addFieldOffset(9, numGridOffset, 0);
+  builder.addFieldOffset(6, typeOffset, 0);
 };
 
 /**
@@ -9330,7 +10022,7 @@ enlight_schema.YoloPostProcessDescriptor.addNumGrid = function(builder, numGridO
  * @param {number} numAnchor
  */
 enlight_schema.YoloPostProcessDescriptor.addNumAnchor = function(builder, numAnchor) {
-  builder.addFieldInt32(10, numAnchor, 0);
+  builder.addFieldInt32(7, numAnchor, 0);
 };
 
 /**
@@ -9338,7 +10030,7 @@ enlight_schema.YoloPostProcessDescriptor.addNumAnchor = function(builder, numAnc
  * @param {flatbuffers.Offset} outputTensorScalesOffset
  */
 enlight_schema.YoloPostProcessDescriptor.addOutputTensorScales = function(builder, outputTensorScalesOffset) {
-  builder.addFieldOffset(11, outputTensorScalesOffset, 0);
+  builder.addFieldOffset(8, outputTensorScalesOffset, 0);
 };
 
 /**
@@ -9367,7 +10059,7 @@ enlight_schema.YoloPostProcessDescriptor.startOutputTensorScalesVector = functio
  * @param {flatbuffers.Offset} imgSizeOffset
  */
 enlight_schema.YoloPostProcessDescriptor.addImgSize = function(builder, imgSizeOffset) {
-  builder.addFieldOffset(12, imgSizeOffset, 0);
+  builder.addFieldOffset(9, imgSizeOffset, 0);
 };
 
 /**
@@ -9396,7 +10088,7 @@ enlight_schema.YoloPostProcessDescriptor.startImgSizeVector = function(builder, 
  * @param {boolean} isSrcTensorDivided
  */
 enlight_schema.YoloPostProcessDescriptor.addIsSrcTensorDivided = function(builder, isSrcTensorDivided) {
-  builder.addFieldInt8(13, +isSrcTensorDivided, +false);
+  builder.addFieldInt8(10, +isSrcTensorDivided, +false);
 };
 
 /**
@@ -9404,7 +10096,7 @@ enlight_schema.YoloPostProcessDescriptor.addIsSrcTensorDivided = function(builde
  * @param {boolean} processSigmoid
  */
 enlight_schema.YoloPostProcessDescriptor.addProcessSigmoid = function(builder, processSigmoid) {
-  builder.addFieldInt8(14, +processSigmoid, +true);
+  builder.addFieldInt8(11, +processSigmoid, +true);
 };
 
 /**
@@ -9412,7 +10104,7 @@ enlight_schema.YoloPostProcessDescriptor.addProcessSigmoid = function(builder, p
  * @param {number} OutScoreScale
  */
 enlight_schema.YoloPostProcessDescriptor.addOutScoreScale = function(builder, OutScoreScale) {
-  builder.addFieldFloat32(15, OutScoreScale, 0.0);
+  builder.addFieldFloat32(12, OutScoreScale, 0.0);
 };
 
 /**
@@ -9420,7 +10112,7 @@ enlight_schema.YoloPostProcessDescriptor.addOutScoreScale = function(builder, Ou
  * @param {number} OutBoxScale
  */
 enlight_schema.YoloPostProcessDescriptor.addOutBoxScale = function(builder, OutBoxScale) {
-  builder.addFieldFloat32(16, OutBoxScale, 0.0);
+  builder.addFieldFloat32(13, OutBoxScale, 0.0);
 };
 
 /**
@@ -9428,7 +10120,7 @@ enlight_schema.YoloPostProcessDescriptor.addOutBoxScale = function(builder, OutB
  * @param {number} ExpTableScale
  */
 enlight_schema.YoloPostProcessDescriptor.addExpTableScale = function(builder, ExpTableScale) {
-  builder.addFieldFloat32(17, ExpTableScale, 0.0);
+  builder.addFieldFloat32(14, ExpTableScale, 0.0);
 };
 
 /**
@@ -9436,7 +10128,7 @@ enlight_schema.YoloPostProcessDescriptor.addExpTableScale = function(builder, Ex
  * @param {number} SigTableScale
  */
 enlight_schema.YoloPostProcessDescriptor.addSigTableScale = function(builder, SigTableScale) {
-  builder.addFieldFloat32(18, SigTableScale, 0.0);
+  builder.addFieldFloat32(15, SigTableScale, 0.0);
 };
 
 /**
@@ -9444,7 +10136,15 @@ enlight_schema.YoloPostProcessDescriptor.addSigTableScale = function(builder, Si
  * @param {number} SoftmaxScale
  */
 enlight_schema.YoloPostProcessDescriptor.addSoftmaxScale = function(builder, SoftmaxScale) {
-  builder.addFieldFloat32(19, SoftmaxScale, 0.0);
+  builder.addFieldFloat32(16, SoftmaxScale, 0.0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} dflRegMax
+ */
+enlight_schema.YoloPostProcessDescriptor.addDflRegMax = function(builder, dflRegMax) {
+  builder.addFieldInt32(17, dflRegMax, 0);
 };
 
 /**
@@ -9461,13 +10161,10 @@ enlight_schema.YoloPostProcessDescriptor.endYoloPostProcessDescriptor = function
  * @param {number} numClass
  * @param {boolean} softmaxEnabled
  * @param {boolean} backgroundEnabled
- * @param {flatbuffers.Offset} anchorsOffset
  * @param {number} nmsScoreThreshold
  * @param {number} nmsIouThreshold
  * @param {boolean} isquantized
  * @param {flatbuffers.Offset} typeOffset
- * @param {flatbuffers.Offset} anchorBoxesOffset
- * @param {flatbuffers.Offset} numGridOffset
  * @param {number} numAnchor
  * @param {flatbuffers.Offset} outputTensorScalesOffset
  * @param {flatbuffers.Offset} imgSizeOffset
@@ -9478,20 +10175,18 @@ enlight_schema.YoloPostProcessDescriptor.endYoloPostProcessDescriptor = function
  * @param {number} ExpTableScale
  * @param {number} SigTableScale
  * @param {number} SoftmaxScale
+ * @param {number} dflRegMax
  * @returns {flatbuffers.Offset}
  */
-enlight_schema.YoloPostProcessDescriptor.createYoloPostProcessDescriptor = function(builder, numClass, softmaxEnabled, backgroundEnabled, anchorsOffset, nmsScoreThreshold, nmsIouThreshold, isquantized, typeOffset, anchorBoxesOffset, numGridOffset, numAnchor, outputTensorScalesOffset, imgSizeOffset, isSrcTensorDivided, processSigmoid, OutScoreScale, OutBoxScale, ExpTableScale, SigTableScale, SoftmaxScale) {
+enlight_schema.YoloPostProcessDescriptor.createYoloPostProcessDescriptor = function(builder, numClass, softmaxEnabled, backgroundEnabled, nmsScoreThreshold, nmsIouThreshold, isquantized, typeOffset, numAnchor, outputTensorScalesOffset, imgSizeOffset, isSrcTensorDivided, processSigmoid, OutScoreScale, OutBoxScale, ExpTableScale, SigTableScale, SoftmaxScale, dflRegMax) {
   enlight_schema.YoloPostProcessDescriptor.startYoloPostProcessDescriptor(builder);
   enlight_schema.YoloPostProcessDescriptor.addNumClass(builder, numClass);
   enlight_schema.YoloPostProcessDescriptor.addSoftmaxEnabled(builder, softmaxEnabled);
   enlight_schema.YoloPostProcessDescriptor.addBackgroundEnabled(builder, backgroundEnabled);
-  enlight_schema.YoloPostProcessDescriptor.addAnchors(builder, anchorsOffset);
   enlight_schema.YoloPostProcessDescriptor.addNmsScoreThreshold(builder, nmsScoreThreshold);
   enlight_schema.YoloPostProcessDescriptor.addNmsIouThreshold(builder, nmsIouThreshold);
   enlight_schema.YoloPostProcessDescriptor.addIsquantized(builder, isquantized);
   enlight_schema.YoloPostProcessDescriptor.addType(builder, typeOffset);
-  enlight_schema.YoloPostProcessDescriptor.addAnchorBoxes(builder, anchorBoxesOffset);
-  enlight_schema.YoloPostProcessDescriptor.addNumGrid(builder, numGridOffset);
   enlight_schema.YoloPostProcessDescriptor.addNumAnchor(builder, numAnchor);
   enlight_schema.YoloPostProcessDescriptor.addOutputTensorScales(builder, outputTensorScalesOffset);
   enlight_schema.YoloPostProcessDescriptor.addImgSize(builder, imgSizeOffset);
@@ -9502,6 +10197,7 @@ enlight_schema.YoloPostProcessDescriptor.createYoloPostProcessDescriptor = funct
   enlight_schema.YoloPostProcessDescriptor.addExpTableScale(builder, ExpTableScale);
   enlight_schema.YoloPostProcessDescriptor.addSigTableScale(builder, SigTableScale);
   enlight_schema.YoloPostProcessDescriptor.addSoftmaxScale(builder, SoftmaxScale);
+  enlight_schema.YoloPostProcessDescriptor.addDflRegMax(builder, dflRegMax);
   return enlight_schema.YoloPostProcessDescriptor.endYoloPostProcessDescriptor(builder);
 }
 
@@ -16178,6 +16874,405 @@ enlight_schema.AnyLayer.createAnyLayer = function(builder, nameOffset, baseOffse
 /**
  * @constructor
  */
+enlight_schema.StringValue = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.StringValue}
+ */
+enlight_schema.StringValue.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.StringValue=} obj
+ * @returns {enlight_schema.StringValue}
+ */
+enlight_schema.StringValue.getRootAsStringValue = function(bb, obj) {
+  return (obj || new enlight_schema.StringValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.StringValue=} obj
+ * @returns {enlight_schema.StringValue}
+ */
+enlight_schema.StringValue.getSizePrefixedRootAsStringValue = function(bb, obj) {
+  return (obj || new enlight_schema.StringValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+enlight_schema.StringValue.prototype.value = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.StringValue.startStringValue = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} valueOffset
+ */
+enlight_schema.StringValue.addValue = function(builder, valueOffset) {
+  builder.addFieldOffset(0, valueOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.StringValue.endStringValue = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} valueOffset
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.StringValue.createStringValue = function(builder, valueOffset) {
+  enlight_schema.StringValue.startStringValue(builder);
+  enlight_schema.StringValue.addValue(builder, valueOffset);
+  return enlight_schema.StringValue.endStringValue(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.FloatValue = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.FloatValue}
+ */
+enlight_schema.FloatValue.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.FloatValue=} obj
+ * @returns {enlight_schema.FloatValue}
+ */
+enlight_schema.FloatValue.getRootAsFloatValue = function(bb, obj) {
+  return (obj || new enlight_schema.FloatValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.FloatValue=} obj
+ * @returns {enlight_schema.FloatValue}
+ */
+enlight_schema.FloatValue.getSizePrefixedRootAsFloatValue = function(bb, obj) {
+  return (obj || new enlight_schema.FloatValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.FloatValue.prototype.value = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.FloatValue.startFloatValue = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} value
+ */
+enlight_schema.FloatValue.addValue = function(builder, value) {
+  builder.addFieldFloat32(0, value, 0.0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.FloatValue.endFloatValue = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} value
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.FloatValue.createFloatValue = function(builder, value) {
+  enlight_schema.FloatValue.startFloatValue(builder);
+  enlight_schema.FloatValue.addValue(builder, value);
+  return enlight_schema.FloatValue.endFloatValue(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.DictValue = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.DictValue}
+ */
+enlight_schema.DictValue.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.DictValue=} obj
+ * @returns {enlight_schema.DictValue}
+ */
+enlight_schema.DictValue.getRootAsDictValue = function(bb, obj) {
+  return (obj || new enlight_schema.DictValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.DictValue=} obj
+ * @returns {enlight_schema.DictValue}
+ */
+enlight_schema.DictValue.getSizePrefixedRootAsDictValue = function(bb, obj) {
+  return (obj || new enlight_schema.DictValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {number} index
+ * @param {enlight_schema.KeyValue=} obj
+ * @returns {enlight_schema.KeyValue}
+ */
+enlight_schema.DictValue.prototype.pairs = function(index, obj) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? (obj || new enlight_schema.KeyValue).__init(this.bb.__indirect(this.bb.__vector(this.bb_pos + offset) + index * 4), this.bb) : null;
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.DictValue.prototype.pairsLength = function() {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.__vector_len(this.bb_pos + offset) : 0;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.DictValue.startDictValue = function(builder) {
+  builder.startObject(1);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} pairsOffset
+ */
+enlight_schema.DictValue.addPairs = function(builder, pairsOffset) {
+  builder.addFieldOffset(0, pairsOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {Array.<flatbuffers.Offset>} data
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.DictValue.createPairsVector = function(builder, data) {
+  builder.startVector(4, data.length, 4);
+  for (var i = data.length - 1; i >= 0; i--) {
+    builder.addOffset(data[i]);
+  }
+  return builder.endVector();
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} numElems
+ */
+enlight_schema.DictValue.startPairsVector = function(builder, numElems) {
+  builder.startVector(4, numElems, 4);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.DictValue.endDictValue = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} pairsOffset
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.DictValue.createDictValue = function(builder, pairsOffset) {
+  enlight_schema.DictValue.startDictValue(builder);
+  enlight_schema.DictValue.addPairs(builder, pairsOffset);
+  return enlight_schema.DictValue.endDictValue(builder);
+}
+
+/**
+ * @constructor
+ */
+enlight_schema.KeyValue = function() {
+  /**
+   * @type {flatbuffers.ByteBuffer}
+   */
+  this.bb = null;
+
+  /**
+   * @type {number}
+   */
+  this.bb_pos = 0;
+};
+
+/**
+ * @param {number} i
+ * @param {flatbuffers.ByteBuffer} bb
+ * @returns {enlight_schema.KeyValue}
+ */
+enlight_schema.KeyValue.prototype.__init = function(i, bb) {
+  this.bb_pos = i;
+  this.bb = bb;
+  return this;
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.KeyValue=} obj
+ * @returns {enlight_schema.KeyValue}
+ */
+enlight_schema.KeyValue.getRootAsKeyValue = function(bb, obj) {
+  return (obj || new enlight_schema.KeyValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.ByteBuffer} bb
+ * @param {enlight_schema.KeyValue=} obj
+ * @returns {enlight_schema.KeyValue}
+ */
+enlight_schema.KeyValue.getSizePrefixedRootAsKeyValue = function(bb, obj) {
+  return (obj || new enlight_schema.KeyValue).__init(bb.readInt32(bb.position()) + bb.position(), bb);
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+enlight_schema.KeyValue.prototype.key = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 4);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
+ * @returns {number}
+ */
+enlight_schema.KeyValue.prototype.value = function() {
+  var offset = this.bb.__offset(this.bb_pos, 6);
+  return offset ? this.bb.readFloat32(this.bb_pos + offset) : 0.0;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ */
+enlight_schema.KeyValue.startKeyValue = function(builder) {
+  builder.startObject(2);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} keyOffset
+ */
+enlight_schema.KeyValue.addKey = function(builder, keyOffset) {
+  builder.addFieldOffset(0, keyOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {number} value
+ */
+enlight_schema.KeyValue.addValue = function(builder, value) {
+  builder.addFieldFloat32(1, value, 0.0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.KeyValue.endKeyValue = function(builder) {
+  var offset = builder.endObject();
+  return offset;
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} keyOffset
+ * @param {number} value
+ * @returns {flatbuffers.Offset}
+ */
+enlight_schema.KeyValue.createKeyValue = function(builder, keyOffset, value) {
+  enlight_schema.KeyValue.startKeyValue(builder);
+  enlight_schema.KeyValue.addKey(builder, keyOffset);
+  enlight_schema.KeyValue.addValue(builder, value);
+  return enlight_schema.KeyValue.endKeyValue(builder);
+}
+
+/**
+ * @constructor
+ */
 enlight_schema.NetworkInfo = function() {
   /**
    * @type {flatbuffers.ByteBuffer}
@@ -16523,10 +17618,36 @@ enlight_schema.NetworkInfo.prototype.yoloVersion = function(optionalEncoding) {
 };
 
 /**
+ * @returns {enlight_schema.DynamicTypeValue}
+ */
+enlight_schema.NetworkInfo.prototype.inputQuantizationScaleType = function() {
+  var offset = this.bb.__offset(this.bb_pos, 64);
+  return offset ? /** @type {enlight_schema.DynamicTypeValue} */ (this.bb.readUint8(this.bb_pos + offset)) : enlight_schema.DynamicTypeValue.NONE;
+};
+
+/**
+ * @param {flatbuffers.Table} obj
+ * @returns {?flatbuffers.Table}
+ */
+enlight_schema.NetworkInfo.prototype.inputQuantizationScale = function(obj) {
+  var offset = this.bb.__offset(this.bb_pos, 66);
+  return offset ? this.bb.__union(obj, this.bb_pos + offset) : null;
+};
+
+/**
+ * @param {flatbuffers.Encoding=} optionalEncoding
+ * @returns {string|Uint8Array|null}
+ */
+enlight_schema.NetworkInfo.prototype.networkInputDtype = function(optionalEncoding) {
+  var offset = this.bb.__offset(this.bb_pos, 68);
+  return offset ? this.bb.__string(this.bb_pos + offset, optionalEncoding) : null;
+};
+
+/**
  * @param {flatbuffers.Builder} builder
  */
 enlight_schema.NetworkInfo.startNetworkInfo = function(builder) {
-  builder.startObject(30);
+  builder.startObject(33);
 };
 
 /**
@@ -16855,6 +17976,30 @@ enlight_schema.NetworkInfo.addYoloVersion = function(builder, yoloVersionOffset)
 
 /**
  * @param {flatbuffers.Builder} builder
+ * @param {enlight_schema.DynamicTypeValue} inputQuantizationScaleType
+ */
+enlight_schema.NetworkInfo.addInputQuantizationScaleType = function(builder, inputQuantizationScaleType) {
+  builder.addFieldInt8(30, inputQuantizationScaleType, enlight_schema.DynamicTypeValue.NONE);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} inputQuantizationScaleOffset
+ */
+enlight_schema.NetworkInfo.addInputQuantizationScale = function(builder, inputQuantizationScaleOffset) {
+  builder.addFieldOffset(31, inputQuantizationScaleOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
+ * @param {flatbuffers.Offset} networkInputDtypeOffset
+ */
+enlight_schema.NetworkInfo.addNetworkInputDtype = function(builder, networkInputDtypeOffset) {
+  builder.addFieldOffset(32, networkInputDtypeOffset, 0);
+};
+
+/**
+ * @param {flatbuffers.Builder} builder
  * @returns {flatbuffers.Offset}
  */
 enlight_schema.NetworkInfo.endNetworkInfo = function(builder) {
@@ -16894,9 +18039,12 @@ enlight_schema.NetworkInfo.endNetworkInfo = function(builder) {
  * @param {flatbuffers.Offset} analysisMethodOffset
  * @param {flatbuffers.Offset} sdkVersionOffset
  * @param {flatbuffers.Offset} yoloVersionOffset
+ * @param {enlight_schema.DynamicTypeValue} inputQuantizationScaleType
+ * @param {flatbuffers.Offset} inputQuantizationScaleOffset
+ * @param {flatbuffers.Offset} networkInputDtypeOffset
  * @returns {flatbuffers.Offset}
  */
-enlight_schema.NetworkInfo.createNetworkInfo = function(builder, modelOffset, typeOffset, hasDetectionLayer, numClass, classLabelsOffset, hasScore, mAP, top5, top1, evaluationDatasetOffset, isFusedNormalization, normMeanOffset, normStdOffset, optimizationOffset, isTracked, trackDatasetOffset, numImages, isQuantized, quantizationMethodOffset, mStd8, mStd4, mStdRatio, clipMinMax, iterWeightMeanCorrection, quantizePostProcess, hasHistogram, quantizationModeOffset, analysisMethodOffset, sdkVersionOffset, yoloVersionOffset) {
+enlight_schema.NetworkInfo.createNetworkInfo = function(builder, modelOffset, typeOffset, hasDetectionLayer, numClass, classLabelsOffset, hasScore, mAP, top5, top1, evaluationDatasetOffset, isFusedNormalization, normMeanOffset, normStdOffset, optimizationOffset, isTracked, trackDatasetOffset, numImages, isQuantized, quantizationMethodOffset, mStd8, mStd4, mStdRatio, clipMinMax, iterWeightMeanCorrection, quantizePostProcess, hasHistogram, quantizationModeOffset, analysisMethodOffset, sdkVersionOffset, yoloVersionOffset, inputQuantizationScaleType, inputQuantizationScaleOffset, networkInputDtypeOffset) {
   enlight_schema.NetworkInfo.startNetworkInfo(builder);
   enlight_schema.NetworkInfo.addModel(builder, modelOffset);
   enlight_schema.NetworkInfo.addType(builder, typeOffset);
@@ -16928,6 +18076,9 @@ enlight_schema.NetworkInfo.createNetworkInfo = function(builder, modelOffset, ty
   enlight_schema.NetworkInfo.addAnalysisMethod(builder, analysisMethodOffset);
   enlight_schema.NetworkInfo.addSdkVersion(builder, sdkVersionOffset);
   enlight_schema.NetworkInfo.addYoloVersion(builder, yoloVersionOffset);
+  enlight_schema.NetworkInfo.addInputQuantizationScaleType(builder, inputQuantizationScaleType);
+  enlight_schema.NetworkInfo.addInputQuantizationScale(builder, inputQuantizationScaleOffset);
+  enlight_schema.NetworkInfo.addNetworkInputDtype(builder, networkInputDtypeOffset);
   return enlight_schema.NetworkInfo.endNetworkInfo(builder);
 }
 
@@ -16962,7 +18113,7 @@ enlight_schema.Network.prototype.__init = function(i, bb) {
  * @param {enlight_schema.Network=} obj
  * @returns {enlight_schema.Network}
  */
-enlight_schema.Network.prototype.getRootAsNetwork = function(bb, obj) {
+enlight_schema.Network.getRootAsNetwork = function(bb, obj) {
   return (obj || new enlight_schema.Network).__init(bb.readInt32(bb.position()) + bb.position(), bb);
 };
 

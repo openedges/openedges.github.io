@@ -2,30 +2,11 @@ import * as protobuf from './protobuf.js';
 
 const EnlightProto = {};
 const EnlightV2 = {};
-EnlightV2.ModelFactory = class {
-    async match(context) {
-        const is_enlight = context.identifier.endsWith('enlight2');
-        if (is_enlight) {
-            context.type = 'enlight_v2';
-            context.target = EnlightProto;
-            return context;
-        }
-        return null;
-    }
 
-    filter(context, type) {
-        return true;
-    }
 
-    async open(context) {
-        const model_bin = new Uint8Array(context.stream._buffer);
-        const protoTest = protobuf.BinaryReader.open(model_bin);
-        const header = EnlightProto.HeaderProto.decode(protoTest);
-        const container =  EnlightProto.NetworkProto.decode(protoTest);
-        return new EnlightV2.Model('', container);
-    }
-};
-
+// ============================================
+// EnlightV2Model - 직접 호출되는 진입점
+// ============================================
 EnlightV2.Model = class {
     constructor(metadata, container) {
         this.graphs = [new EnlightV2.Graph(metadata, container)];
@@ -33,23 +14,178 @@ EnlightV2.Model = class {
         this.name = configuration && configuration.name || "";
         this.format = 'enlightV2';
         this.producer = 'Openedges Technology';
-        //this.metadata = []
         this.metadata = [
             {name: "converted", value: container.metadata.converted},
             {name: "quantized", value: container.metadata.quantized},
-            //{name: "denorm_input", value: container.metadata.denorm_input}, // deprecated
             {name: "norm", value: container.metadata.norm},
             {name: "backend", value: container.metadata.backend},
             {name: "model_ext", value: container.metadata.model_ext}
         ]
     }
 
+    /**
+     * 🎯 이 메서드가 enlight.ModelFactory에서 호출됨!
+     */
     static open(context) {
         const model_bin = new Uint8Array(context.stream._buffer);
-        const protoTest = protobuf.BinaryReader.open(model_bin);
-        const header = EnlightProto.HeaderProto.decode(protoTest);
-        const container =  EnlightProto.NetworkProto.decode(protoTest);
+        
+        console.log(`\n${'='.repeat(60)}`);
+        console.log(`📂 EnlightV2Model.open() called`);
+        console.log(`📊 File size: ${(model_bin.length / (1024*1024)).toFixed(2)} MB`);
+        console.log('='.repeat(60));
+        
+        // 1. TOC 확인
+        const toc = TOCUtils.readTOC(model_bin);
+        
+        if (toc) {
+            console.log('\n✅ TOC format detected\n');
+            return this._openWithTOC(model_bin, toc);
+        } else {
+            console.log('\n⚠️  Legacy format (no TOC)\n');
+            return this._openLegacy(model_bin);
+        }
+    }
+    
+    /**
+     * TOC 포맷으로 열기
+     */
+    static _openWithTOC(model_bin, toc) {
+        console.log('📖 Step 1: Parsing protobuf section...');
+        
+        // Protobuf 영역만 추출
+        const protoBuffer = model_bin.slice(0, toc.protoEnd);
+        const protoReader = protobuf.BinaryReader.open(protoBuffer);
+        
+        try {
+            // Header 파싱
+            const header = EnlightProto.HeaderProto.decode(protoReader);
+            if (!header) {
+                throw new Error('Invalid header');
+            }
+            console.log(`  ✓ Header parsed (position: ${protoReader.position})`);
+            
+            // NetworkProto 파싱
+            const networkLength = protoReader.length - protoReader.position;
+            const container = EnlightProto.NetworkProto.decode(protoReader, networkLength);
+            console.log(`  ✓ NetworkProto parsed (position: ${protoReader.position})`);
+            console.log(`  ✓ Found ${Object.keys(container.buffers).length} buffer definitions\n`);
+            
+            // 2. External buffers 로드
+            console.log('📦 Step 2: Loading external buffers from TOC...\n');
+            this._loadExternalBuffers(container, toc.entries);
+            
+            // 3. 최종 검증
+            console.log('\n🔍 Step 3: Final verification...');
+            const verification = this._verifyBuffers(container);
+            
+            if (verification.emptyCount > 0) {
+                console.error(`\n❌ WARNING: ${verification.emptyCount} buffers are still empty!`);
+            } else {
+                console.log(`\n✅ SUCCESS: All ${verification.totalCount} buffers loaded!\n`);
+            }
+            
+            return new EnlightV2.Model('', container);
+            
+        } catch (e) {
+            console.error('\n❌ Error parsing with TOC:', e);
+            throw e;
+        }
+    }
+    
+    /**
+     * Legacy 포맷으로 열기 (기존 코드)
+     */
+    static _openLegacy(model_bin) {
+        const protoReader = protobuf.BinaryReader.open(model_bin);
+        const header = EnlightProto.HeaderProto.decode(protoReader);
+        const container = EnlightProto.NetworkProto.decode(protoReader);
+        
+        console.log(`✓ Loaded ${Object.keys(container.buffers).length} buffers (inline data)\n`);
+        
         return new EnlightV2.Model('', container);
+    }
+    
+    /**
+     * TOC에서 external buffer 데이터를 container에 로드
+     */
+    static _loadExternalBuffers(container, tocEntries) {
+        const tocIds = Object.keys(tocEntries);
+        const bufferIds = Object.keys(container.buffers);
+        
+        console.log(`  TOC entries: ${tocIds.length}`);
+        console.log(`  Buffer definitions: ${bufferIds.length}\n`);
+        
+        let loadedCount = 0;
+        let skippedCount = 0;
+        let errorCount = 0;
+        
+        // 각 버퍼에 대해 TOC에서 데이터 로드
+        for (const [bufferId, buffer] of Object.entries(container.buffers)) {
+            const entry = tocEntries[bufferId];
+            
+            if (!entry) {
+                console.warn(`  ⚠️  ${bufferId}: No TOC entry found`);
+                skippedCount++;
+                continue;
+            }
+            
+            // 이미 데이터가 있으면 스킵 (legacy inline data)
+            if (buffer.data && buffer.data.length > 0) {
+                console.log(`  ⏭️  ${bufferId}: Already has inline data`);
+                loadedCount++;
+                continue;
+            }
+            
+            try {
+                // TypedArray 생성
+                const typedArray = TOCUtils.createTypedArray(
+                    entry.rawData,
+                    entry.dtype,
+                    entry.shape
+                );
+                
+                buffer.data = typedArray;
+                loadedCount++;
+                
+                const dtypeName = TOCUtils.getDtypeName(entry.dtype);
+                console.log(`  ✅ ${bufferId}: ${dtypeName}[${entry.shape.join(',')}] (${typedArray.length} elements)`);
+                
+            } catch (e) {
+                console.error(`  ❌ ${bufferId}: Load failed - ${e.message}`);
+                errorCount++;
+            }
+        }
+        
+        console.log(`\n  Summary: ${loadedCount} loaded, ${skippedCount} skipped, ${errorCount} errors`);
+    }
+    
+    /**
+     * 모든 버퍼가 제대로 로드되었는지 검증
+     */
+    static _verifyBuffers(container) {
+        let totalCount = 0;
+        let emptyCount = 0;
+        const emptyBuffers = [];
+        
+        for (const [bufferId, buffer] of Object.entries(container.buffers)) {
+            totalCount++;
+            
+            if (!buffer.data || buffer.data.length === 0) {
+                emptyCount++;
+                emptyBuffers.push(bufferId);
+            }
+        }
+        
+        if (emptyCount > 0) {
+            console.log(`\n  Empty buffers:`);
+            emptyBuffers.forEach(id => console.log(`    - ${id}`));
+        }
+        
+        return {
+            totalCount,
+            emptyCount,
+            emptyBuffers
+        };
     }
 };
 
@@ -389,76 +525,28 @@ EnlightProto.HeaderProto = class {
     }
 };
 
-EnlightProto.NetworkProto = class {
+
+EnlightProto.QParamProto = class {
     constructor() {
-        this.header = {};
-        this.inputs = [];
-        this.outputs = [];
-        this.order = [];
-        this.collectors = [];
-        this.tensors = [];
-        this.buffers = {};
-        this.collectors = [];
-        this.layers = [];
-        this.metadata = {};
-        this.inputs_inference = [];
-        this.outputs_inference = [];
+        this.idx = '';
+        this.data = []; 
     }
 
     static decode(reader, length) {
         const end = length === undefined ? reader.length : reader.position + length;
-        const message = new EnlightProto.NetworkProto();
+        const message = new EnlightProto.QParamProto();
         while (reader.position < end) {
             const tag = reader.uint32();
             const field = tag >>> 3;
             switch (field) {
                 case 1: {
-                    const read_length = reader.uint32();
-                    message.header = EnlightProto.NetworkHeaderProto.decode(reader, read_length);
+                    message.idx = reader.string();
                     break;
                 }
                 case 2: {
-                    const read_length = reader.uint32();
-                    message.layers.push(EnlightProto.Layer.decode(reader, read_length));
+                    message.data = reader.doubles(message.data, tag);
                     break;
                 }
-                case 3: {
-                    const read_length = reader.uint32();
-                    const tensor = EnlightProto.Tensor.decode(reader, read_length);
-                    message.tensors[tensor.idx] = tensor;
-                    break;
-                }
-                case 4: {
-                    const read_length = reader.uint32();
-                    const buffer = EnlightProto.Buffer.decode(reader, read_length);
-                    message.buffers[buffer.idx] = buffer;
-                    break;
-                }
-                case 5:
-                    var value = new proto.enlight.CollectorProto;
-                    reader.readMessage(value, proto.enlight.CollectorProto.deserializeBinaryFromReader);
-                    message.addCollectors(value);
-                    break;
-                case 6:
-                    message.inputs.push(reader.string());
-                    break;
-                case 7:
-                    message.outputs.push(reader.string());
-                    break;
-                case 8:
-                    message.order.push(reader.string());
-                    break;
-                case 9: {
-                    const read_length = reader.uint32();
-                    message.metadata = EnlightProto.MetadataProto.decode(reader, read_length);
-                    break;
-                }
-                case 10:
-                    message.inputs_inference.push(reader.string());
-                    break;
-                case 11:
-                    message.outputs_inference.push(reader.string());
-                    break;
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -467,6 +555,149 @@ EnlightProto.NetworkProto = class {
         return message;
     }
 };
+
+
+EnlightProto.NetworkProto = class {
+    constructor() {
+        this.header = {};
+        this.inputs = [];
+        this.outputs = [];
+        this.order = [];
+        this.collectors = [];
+        this.tensors = {};
+        this.buffers = {};
+        this.layers = [];
+        this.metadata = {};
+        this.inputs_inference = [];
+        this.outputs_inference = [];
+        this.input_qparam = [];
+        this.output_qparam = [];
+    }
+
+    static decode(reader, length) {
+        const end = length === undefined ? reader.length : reader.position + length;
+        const message = new EnlightProto.NetworkProto();
+        
+        console.log(`NetworkProto.decode: start=${reader.position}, end=${end}, length=${length}`);
+        
+        while (reader.position < end) {
+            const tagPosition = reader.position;
+            
+            // 범위 체크
+            if (reader.position >= reader.length) {
+                console.log(`Reached end of buffer at position ${reader.position}`);
+                break;
+            }
+            
+            try {
+                const tag = reader.uint32();
+                const field = tag >>> 3;
+                const wireType = tag & 7;
+                
+                console.log(`[${tagPosition}] Field ${field}, Wire ${wireType}`);
+                
+                // Invalid wire type 체크
+                if (wireType > 5 || wireType === 3 || wireType === 4) {
+                    console.error(`❌ Invalid wire type ${wireType} at position ${tagPosition}`);
+                    console.error(`This likely means we've read past the protobuf section`);
+                    console.error(`Tag: 0x${tag.toString(16)}, Field: ${field}`);
+                    break;
+                }
+                
+                switch (field) {
+                    case 1: {
+                        const read_length = reader.uint32();
+                        message.header = EnlightProto.NetworkHeaderProto.decode(reader, read_length);
+                        break;
+                    }
+                    case 2: {
+                        const read_length = reader.uint32();
+                        message.layers.push(EnlightProto.Layer.decode(reader, read_length));
+                        break;
+                    }
+                    case 3: {
+                        const read_length = reader.uint32();
+                        const tensor = EnlightProto.Tensor.decode(reader, read_length);
+                        message.tensors[tensor.idx] = tensor;
+                        break;
+                    }
+                    case 4: {
+                        const read_length = reader.uint32();
+                        const buffer = EnlightProto.Buffer.decode(reader, read_length);
+                        message.buffers[buffer.idx] = buffer;
+                        break;
+                    }
+                    case 5:
+                        // CollectorProto - skip if not implemented
+                        console.warn('CollectorProto not implemented, skipping');
+                        reader.skipType(wireType);
+                        break;
+                    case 6:
+                        const input = reader.string();
+                        if (input !== '') {
+                            message.inputs.push(input);
+                        }
+                        break;
+                    case 7:
+                        const output = reader.string();
+                        if (output !== '') {
+                            message.outputs.push(output);
+                        }
+                        break;
+                    case 8:
+                        const order = reader.string();
+                        if (order !== '') {
+                            message.order.push(order);
+                        }
+                        break;
+                    case 9: {
+                        const read_length = reader.uint32();
+                        message.metadata = EnlightProto.MetadataProto.decode(reader, read_length);
+                        break;
+                    }
+                    case 10:
+                        const input_inference = reader.string();
+                        if (input_inference !== '') {
+                            message.inputs_inference.push(input_inference);
+                        }
+                        break;
+                    case 11:
+                        const output_inference = reader.string();
+                        if (output_inference !== '') {
+                            message.outputs_inference.push(output_inference);
+                        }
+                        break;
+                    case 12: {
+                        const read_length = reader.uint32();
+                        message.input_qparam.push(EnlightProto.QParamProto.decode(reader, read_length));
+                        break;
+                    }
+                    case 13: {
+                        const read_length = reader.uint32();
+                        message.output_qparam.push(EnlightProto.QParamProto.decode(reader, read_length));
+                        break;
+                    }
+                    default:
+                        console.log(`Unknown field ${field}, skipping...`);
+                        reader.skipType(wireType);
+                        break;
+                }
+                
+            } catch (e) {
+                console.error(`Error at position ${reader.position}:`, e);
+                throw e;
+            }
+        }
+        
+        console.log(`NetworkProto.decode complete: position=${reader.position}`);
+        console.log(`  Layers: ${message.layers.length}`);
+        console.log(`  Tensors: ${Object.keys(message.tensors).length}`);
+        console.log(`  Buffers: ${Object.keys(message.buffers).length}`);
+        
+        return message;
+    }
+};
+
 
 EnlightProto.NetworkHeaderProto = class {
     constructor() {
@@ -554,14 +785,14 @@ EnlightProto.NormInfoProto = class {
             const field = tag >>> 3;
             switch (field) {
                 case 1:
-                    message.mean = reader.floats(message.mean, tag);
+                    message.mean = reader.doubles(message.mean, tag);
                     break;
                 case 2:
                     message.mean_shape = reader.array(message.mean_shape,
                         () => BigInt(reader.int64()), tag);
                     break;
                 case 3:
-                    message.std = reader.floats(message.std, tag);
+                    message.std = reader.doubles(message.std, tag);
                     break;
                 case 4:
                     message.std_shape = reader.array(message.std_shape,
@@ -645,7 +876,6 @@ EnlightProto.Layer = class {
 };
 
 
-
 EnlightProto.Shape = class {
     constructor() {
         this.value = '';
@@ -679,6 +909,45 @@ EnlightProto.Shape = class {
 }
 
 
+EnlightProto.TensorQinfo = class {
+    constructor() {
+        this.qscheme = '';
+        this.bw = '';
+        this.scale = [];
+        this.zp = [];
+        this.axis = '';
+    }
+
+    static decode(reader, length) {
+        const end = length === undefined ? reader.length : reader.position + length;
+        const message = new EnlightProto.TensorQinfo();
+        while (reader.position < end) {
+            const tag = reader.uint32();
+            const field = tag >>> 3;
+            switch (field) {
+                case 1:
+                    message.qscheme = reader.string();
+                    break;
+                case 2:
+                    message.bw = BigInt(reader.int64());
+                    break;
+                case 3:
+                    message.scale = reader.doubles(message.scale, tag);
+                    break;
+                case 4:
+                    message.zp = reader.doubles(message.zp, tag);
+                    break;
+                case 5:
+                    message.axis = BigInt(reader.int64());
+                    break;
+                default:
+                    reader.skipType(tag & 7);
+                    break;
+            }
+        }
+        return message;
+    }
+};
 
 EnlightProto.Tensor = class {
     constructor() {
@@ -689,6 +958,7 @@ EnlightProto.Tensor = class {
         this.src = '';
         this.dsts = [];
         this.shape = [];
+        this.qinfo = [];
     }
 
     static getTensorType(value) {
@@ -731,12 +1001,18 @@ EnlightProto.Tensor = class {
                 case 6:
                     message.dsts.push(reader.string());
                     break;
-                case 7:
+                case 7: {
                     const read_length = reader.uint32();
                     message.shape.push(EnlightProto.Shape.decode(reader, read_length));
                     //message.shape = reader.array(message.shape,
                     //    () => BigInt(reader.int64()), tag);
                     break;
+                }
+                case 8: {
+                    const read_length = reader.uint32();
+                    message.qinfo.push(EnlightProto.TensorQinfo.decode(reader, read_length));
+                    break;
+                }
                 default:
                     reader.skipType(tag & 7);
                     break;
@@ -746,21 +1022,24 @@ EnlightProto.Tensor = class {
     }
 };
 
+
 EnlightProto.Buffer = class {
     constructor() {
         this.dataType = '';
         this.idx = '';
         this.name = '';
         this.dsts = [];
-        this.data = [];
+        this.data = null;  // TOC 사용 시 나중에 채워짐
     }
 
     static decode(reader, length) {
         const message = new EnlightProto.Buffer();
         const end = length === undefined ? reader.length : reader.position + length;
+        
         while (reader.position < end) {
             const tag = reader.uint32();
             const field = tag >>> 3;
+            
             switch (field) {
                 case 1:
                     message.dataType = EnlightProto.getDataType(reader.uint32());
@@ -775,50 +1054,63 @@ EnlightProto.Buffer = class {
                     message.dsts.push(reader.string());
                     break;
                 case 5:
+                    // Legacy format: inline data
+                    // TOC format에서는 이 필드가 비어있음
                     const rawData = reader.bytes();
-                    switch (message.dataType) {
-                        case 'int64':
-                            message.data = new BigInt64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
-                            break;
-                        case 'uint64':
-                            message.data = new BigUint64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
-                            break;                        
-                        case 'float64':
-                            message.data = new Float64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
-                            break;
-                        case 'float32':
-                            message.data = new Float32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
-                            break;
-                        case 'uint8':
-                            message.data = new Uint8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
-                            break;
-                        case 'int8':
-                            message.data = new Int8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
-                            break;
-                        case 'uint16':
-                            message.data = new Uint16Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 2);
-                            break;
-                        case 'int16':
-                            message.data = new Int16Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 2);
-                            break;
-                        case 'uint32':
-                            message.data = new Uint32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
-                            break;
-                        case 'int32':
-                            message.data = new Int32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
-                            break;                    
-                        case 'bool':
-                            message.data = new Uint8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
-                            break;
-                        default:
-                            throw new Error(`Unsupported dataType '${message.dataType}' in EnlightProto.Buffer.decode.`);
+                    
+                    if (rawData.length > 0) {
+                        console.log(`Reading inline data for buffer ${message.idx} (legacy format)`);
+                        
+                        switch (message.dataType) {
+                            case 'int64':
+                                message.data = new BigInt64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
+                                break;
+                            case 'uint64':
+                                message.data = new BigUint64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
+                                break;                        
+                            case 'float64':
+                            case 'double':
+                                message.data = new Float64Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 8);
+                                break;
+                            case 'float32':
+                                message.data = new Float32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
+                                break;
+                            case 'uint8':
+                                message.data = new Uint8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
+                                break;
+                            case 'int8':
+                                message.data = new Int8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
+                                break;
+                            case 'uint16':
+                                message.data = new Uint16Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 2);
+                                break;
+                            case 'int16':
+                                message.data = new Int16Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 2);
+                                break;
+                            case 'uint32':
+                                message.data = new Uint32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
+                                break;
+                            case 'int32':
+                                message.data = new Int32Array(rawData.buffer, rawData.byteOffset, rawData.byteLength / 4);
+                                break;                    
+                            case 'bool':
+                                message.data = new Uint8Array(rawData.buffer, rawData.byteOffset, rawData.byteLength);
+                                break;
+                            default:
+                                throw new Error(`Unsupported dataType '${message.dataType}' in EnlightProto.Buffer.decode.`);
+                        }
+                    } else {
+                        // TOC format: data는 나중에 _loadExternalBuffers에서 채워짐
+                        message.data = null;
                     }
                     break;
+                    
                 default:
                     reader.skipType(tag & 7);
                     break;
             }
         }
+        
         return message;
     }
 };
@@ -874,7 +1166,7 @@ EnlightProto.Attribute = class {
                     message.type = reader.uint32();
                     break;
                 case 3:
-                    message.F = reader.float();
+                    message.F = reader.double();
                     break;
                 case 4:
                     message.I = BigInt(reader.int64());
@@ -886,7 +1178,8 @@ EnlightProto.Attribute = class {
                     message.B = reader.bool();
                     break;
                 case 7:
-                    message.floats = reader.floats(message.floats, tag);
+                    message.floats = reader.array(message.floats,
+                        () => reader.double(), tag);
                     break;
                 case 8:
                     message.ints = reader.array(message.ints,
@@ -949,6 +1242,7 @@ EnlightProto.FusedLayer = class {
 
 EnlightProto.LayerType = {
     LAYER_UNDEFINED: 0,
+
     LAYER_RELU: 1,
     LAYER_SIGMOID: 2,
     LAYER_LEAKYRELU: 3,
@@ -1065,8 +1359,11 @@ EnlightProto.LayerType = {
     LAYER_SCALEDOTPRODUCTATTENTION: 114,
     LAYER_SPLITHEAD: 115,
     LAYER_MERGEHEAD: 116,
-    LAYER_UNKNOWN: 117,
-    LAYER_ANY: 118
+    LAYER_RMSNORM: 117,
+    LAYER_ROPE: 118,
+    LAYER_NNLUT: 119,
+    LAYER_UNKNOWN: 120,
+    LAYER_Any: 121,
 };
 
 EnlightProto.LayerType.list = Object.keys(EnlightProto.LayerType).map((type) => type.replace("LAYER_", ""));
@@ -1094,13 +1391,15 @@ EnlightProto.LayerType.getCategory = function(type) {
         EnlightProto.LayerType.LAYER_LINEARAPPROX,
         EnlightProto.LayerType.LAYER_LINEARAPPROXLU,
         EnlightProto.LayerType.LAYER_SOFTMAX,
-        EnlightProto.LayerType.LAYER_LOGSOFTMAX
+        EnlightProto.LayerType.LAYER_LOGSOFTMAX,
+        EnlightProto.LayerType.LAYER_NNLUT,
     ];
 
     const normalization = [
         EnlightProto.LayerType.LAYER_L2NORM,
         EnlightProto.LayerType.LAYER_LAYERNORM,
-        EnlightProto.LayerType.LAYER_BATCHNORM
+        EnlightProto.LayerType.LAYER_BATCHNORM,
+        EnlightProto.LayerType.LAYER_RMSNORM,
     ];
 
     const arithmetic = [
@@ -1127,7 +1426,8 @@ EnlightProto.LayerType.getCategory = function(type) {
         EnlightProto.LayerType.LAYER_TILE,
         EnlightProto.LayerType.LAYER_EQUAL,
         EnlightProto.LayerType.LAYER_MULCONST,
-        EnlightProto.LayerType.LAYER_ADDCONST
+        EnlightProto.LayerType.LAYER_ADDCONST,
+        EnlightProto.LayerType.LAYER_ROPE,
     ];
 
     const pool = [
@@ -1291,6 +1591,8 @@ EnlightProto.getDataType = function(value) {
             return 'double';
         case 13:
             return 'bool';
+        case 14:
+            return 'bfloat16';
         default:
             return 'undefined';
     }
@@ -1313,8 +1615,176 @@ EnlightProto.DataType = {
     DATA_FLOAT: 11,
     DATA_FLOAT64: 12,
     DATA_DOUBLE: 12,
-    DATA_BOOL: 13
+    DATA_BOOL: 13,
+    DATA_BFLOAT16: 14,
 };
 
 export const ModelFactory = EnlightV2.ModelFactory;
 export const EnlightV2Model = EnlightV2.Model;
+
+
+// TOC 관련 유틸리티 함수들
+const TOCUtils = {
+    MAGIC: 'ENLTTOC0',
+    FOOTER_SIZE: 24,
+    
+    /**
+     * 파일에서 TOC 정보를 읽어옵니다
+     */
+    readTOC(buffer) {
+        const fileSize = buffer.length;
+        
+        if (fileSize < this.FOOTER_SIZE) {
+            console.log('File too small to contain TOC');
+            return null;
+        }
+        
+        // Footer 읽기 (마지막 24바이트)
+        const footerOffset = fileSize - this.FOOTER_SIZE;
+        const _uint8 = new Uint8Array(buffer.slice(footerOffset, footerOffset + 8));
+        const magicString = new TextDecoder('ascii').decode(_uint8);
+
+        if (magicString !== this.MAGIC) {
+            console.log('No TOC found - using legacy format');
+            return null;
+        }
+        
+        const view = new DataView(buffer.buffer, buffer.byteOffset + footerOffset + 8, 16);
+        const tocSize = Number(view.getBigUint64(0, true));  // little-endian
+        const protoEnd = Number(view.getBigUint64(8, true));
+        
+        console.log('TOC Footer found:');
+        console.log(`  Magic: ${magicString}`);
+        console.log(`  TOC size: ${tocSize} bytes`);
+        console.log(`  Proto end: ${protoEnd}`);
+        
+        // TOC 영역 읽기
+        const tocOffset = footerOffset - tocSize;
+        const tocBuffer = buffer.slice(tocOffset, footerOffset);
+        
+        return {
+            protoEnd,
+            tocSize,
+            tocOffset,
+            entries: this.parseTOCEntries(tocBuffer, buffer)
+        };
+    },
+    
+    /**
+     * TOC 엔트리들을 파싱합니다
+     */
+    parseTOCEntries(tocBuffer, fullBuffer) {
+        const view = new DataView(tocBuffer.buffer, tocBuffer.byteOffset, tocBuffer.byteLength);
+        let offset = 0;
+        
+        // 엔트리 개수
+        const numEntries = Number(view.getBigUint64(offset, true));
+        offset += 8;
+        
+        console.log(`TOC has ${numEntries} entries`);
+        
+        const entries = {};
+        
+        for (let i = 0; i < numEntries; i++) {
+            // ID 읽기
+            const idLen = view.getUint16(offset, true);
+            offset += 2;
+            
+            const id = new TextDecoder('utf-8').decode(
+                tocBuffer.slice(offset, offset + idLen)
+            );
+            offset += idLen;
+            
+            // 메타데이터
+            const dtype = view.getUint8(offset);
+            offset += 1;
+            
+            const rank = view.getUint16(offset, true);
+            offset += 2;
+            
+            const shape = [];
+            for (let j = 0; j < rank; j++) {
+                shape.push(Number(view.getBigInt64(offset, true)));
+                offset += 8;
+            }
+            
+            const dataOffset = Number(view.getBigUint64(offset, true));
+            offset += 8;
+            
+            const length = Number(view.getBigUint64(offset, true));
+            offset += 8;
+            
+            // 실제 데이터 추출
+            const rawData = fullBuffer.slice(dataOffset, dataOffset + length);
+            
+            entries[id] = {
+                id,
+                dtype,
+                shape,
+                offset: dataOffset,
+                length,
+                rawData
+            };
+            
+            console.log(`  [${i}] ${id}: dtype=${dtype}, shape=[${shape}], offset=${dataOffset}, length=${length}`);
+        }
+        
+        return entries;
+    },
+    
+    getDtypeName(dtype) {
+        const dtypeMap = {
+            0: 'none',
+            1: 'uint8',
+            2: 'uint16',
+            3: 'uint32',
+            4: 'uint64',
+            5: 'int8',
+            6: 'int16',
+            7: 'int32',
+            8: 'int64',
+            9: 'float8',
+            10: 'float16',
+            11: 'float32',
+            12: 'float64',
+            13: 'bool',
+            14: 'bfloat16'
+        };
+        return dtypeMap[dtype] || `unknown(${dtype})`;
+    },
+
+    /**
+     * dtype 값을 기반으로 TypedArray 생성
+     */
+    createTypedArray(rawData, dtype, shape) {
+        const totalSize = shape.reduce((a, b) => a * b, 1);
+        
+        switch (dtype) {
+            case 1: // uint8
+                return new Uint8Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 2: // uint16
+                return new Uint16Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 3: // uint32
+                return new Uint32Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 4: // uint64
+                return new BigUint64Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 5: // int8
+                return new Int8Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 6: // int16
+                return new Int16Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 7: // int32
+                return new Int32Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 8: // int64
+                return new BigInt64Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 11: // float32
+                return new Float32Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 12: // double/float64
+                return new Float64Array(rawData.buffer, rawData.byteOffset, totalSize);
+            case 13: // bool
+                return new Uint8Array(rawData.buffer, rawData.byteOffset, totalSize);
+            default:
+                console.warn(`Unsupported dtype ${dtype}, returning raw data`);
+                return rawData;
+        }
+    }
+};

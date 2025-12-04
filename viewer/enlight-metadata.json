@@ -230,6 +230,24 @@
     }
   },
   {
+    "name": "GeluLayer",
+    "schema": {
+      "category": "Activation",
+      "attributes": [
+        { "name": "approximate", "type": "string", "src": "approximate" }
+      ]
+    }
+  },
+  {
+    "name": "GeluAttentionLayer",
+    "schema": {
+      "category": "Activation",
+      "attributes": [
+        { "name": "approximate", "type": "string", "src": "approximate" }
+      ]
+    }
+  },
+  {
     "name": "ConstantLayer",
     "schema": {
       "category": "Tensor",
@@ -332,8 +350,10 @@
     "name": "YoloPostProcessLayer",
     "schema": {
       "category": "Custom",
+      "inputs": [
+        { "name": "anchors", "src": "anchors" }
+      ],      
       "attributes": [
-        { "name": "anchors", "type": "float", "src": "anchors" },
         { "name": "nmsClass", "type": "int", "src": "numClass" },
         { "name": "nmsScoreThreshold", "type": "float", "src": "nmsScoreThreshold" },
         { "name": "numIouThreshold", "type": "float", "src": "nmsIouThreshold" },
