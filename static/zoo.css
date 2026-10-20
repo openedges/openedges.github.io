@@ -1,0 +1,349 @@
+/* Enlight Model Zoo -- one stylesheet, no dependencies, light only.
+ *
+ * Colours come from the OPENEDGES brand sheet (site/assets/img). Only the documented
+ * steps are used, with two documented exceptions:
+ *
+ * - Link and body text use #3A6CC4, the brand blue held at its hue and darkened, because
+ *   #5087E1 itself is 3.56:1 on white and fails the 4.5:1 text floor. The true brand blue
+ *   is kept for the logo, fills and borders, which is what it is for.
+ * - The neutrals are derived from the blue shades (#192846 / #28466E) rather than being
+ *   grey, so the page reads as one family; the brand sheet documents no neutral ramp.
+ *
+ * Magenta carries the one warning the pages can show, Violet is a non-encoding accent,
+ * and Mint is unused for now. Nothing in the model table is colour-coded: the two
+ * accuracy columns are numbers, and the reader compares them.
+ *
+ * The page does not follow the reader's dark-mode setting: color-scheme is pinned to
+ * light so the form controls come out light too, rather than the browser painting dark
+ * inputs onto a light page.
+ */
+
+:root {
+  color-scheme: light;
+
+  /* --- brand ramps, verbatim from the brand sheet --- */
+  --oe-blue-50: #dce6fa;
+  --oe-blue-200: #a5c3f0;
+  --oe-blue-500: #5087e1;
+  --oe-blue-800: #28466e;
+  --oe-blue-900: #192846;
+
+  --oe-violet-50: #d7d7f0;
+  --oe-violet-200: #a096d7;
+  --oe-violet-600: #412daf;
+  --oe-violet-800: #321e7d;
+  --oe-violet-900: #1e145a;
+
+  --oe-magenta-50: #f0dcfa;
+  --oe-magenta-200: #d7aff0;
+  --oe-magenta-500: #aa5fe1;
+  --oe-magenta-800: #55326e;
+  --oe-magenta-900: #3c1e50;
+
+  --oe-mint-50: #cdfaf0;
+  --oe-mint-200: #8cf0e6;
+  --oe-mint-500: #00dcbe;
+  --oe-mint-800: #006e5f;
+
+  --font-fallback: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-sans: "Noto Sans CJK KR", var(--font-fallback);
+  --font-mono: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+
+  --radius: 10px;
+  /* The masthead's own height plus its 1px bottom border, which sits outside it. Anchor
+   * jumps offset by this so a heading does not land under the sticky masthead. */
+  --masthead: 59px;
+
+  /* --- light theme --- */
+  --bg: #f6f8fc;
+  --panel: #ffffff;
+  --panel-sunk: #f2f5fb;
+  --ink: var(--oe-blue-900);
+  --ink-soft: var(--oe-blue-800);
+  /* Darkened from #6b7f9e, which was 3.83:1 on the page background: this carries the
+   * column headers and field labels at 10.5-13px, so the 4.5:1 text floor applies. */
+  --ink-faint: #5c6c81;
+  --line: #e2e8f2;
+  --line-soft: #edf1f8;
+
+  --accent: #3a6cc4;
+  --accent-ink: #2f5fb3;
+  /* A lighter tint than brand blue-50 (#DCE6FA): that step is saturated enough that the
+   * link, the faint label ink and the focus ring drawn over a hovered row all fell below
+   * their floors on it. Still a visible 1.11 against the white panel. */
+  --accent-soft: #eef3fd;
+  --brand: var(--oe-blue-500);
+
+  --warn-ink: var(--oe-magenta-800);
+
+  --shadow: 0 1px 2px rgba(25, 40, 70, 0.04), 0 4px 16px rgba(25, 40, 70, 0.04);
+}
+
+* { box-sizing: border-box; }
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 15px/1.6 var(--font-sans);
+  -webkit-text-size-adjust: 100%;
+}
+
+code, pre, .num, .hash { font-family: var(--font-mono); }
+code {
+  font-size: 0.88em; background: var(--panel-sunk); color: var(--ink-soft);
+  padding: 0.1em 0.38em; border-radius: 4px; border: 1px solid var(--line-soft);
+}
+pre {
+  background: var(--panel-sunk); border: 1px solid var(--line); border-radius: var(--radius);
+  padding: 0.85rem 1rem; overflow-x: auto; font-size: 12.5px; line-height: 1.5; margin: 0.6rem 0 0;
+}
+pre code { background: none; padding: 0; border: 0; }
+a { color: var(--accent); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+a:hover { color: var(--accent-ink); text-decoration-thickness: 2px; }
+
+/* Wide, and only lightly inset: the model table carries ten columns and wants the room.
+ * Blocks of prose cap their own measure below, so nothing else stretches with it. */
+.wrap { max-width: 1600px; margin: 0 auto; padding: 0 1rem; }
+
+/* ---- masthead ---- */
+
+.masthead {
+  border-bottom: 1px solid var(--line);
+  background: var(--panel);
+  position: sticky; top: 0; z-index: 20;
+}
+.masthead .wrap {
+  display: flex; align-items: center; gap: 1.5rem;
+  height: calc(var(--masthead) - 1px);
+}
+.brand {
+  display: flex; align-items: center; gap: 0.7rem;
+  color: var(--ink); text-decoration: none;
+  font-weight: 700; letter-spacing: -0.01em;
+}
+.brand img { height: 22px; width: auto; display: block; }
+.brand .divider { width: 1px; height: 20px; background: var(--line); }
+.brand .product { font-size: 15px; color: var(--ink-soft); font-weight: 500; }
+.brand:hover .product { color: var(--accent); }
+.masthead nav { margin-left: auto; display: flex; gap: 1.25rem; font-size: 14px; }
+.masthead nav a { color: var(--ink-soft); text-decoration: none; }
+.masthead nav a:hover { color: var(--accent); }
+
+/* ---- hero ---- */
+
+.hero { padding: 2.75rem 0 1.5rem; }
+h1 {
+  font-size: 2rem; line-height: 1.15; margin: 0 0 0.6rem;
+  letter-spacing: -0.025em; font-weight: 700;
+}
+.lede { color: var(--ink-soft); max-width: 68ch; margin: 0; }
+
+.counts {
+  /* A row gap as well as a column gap: these wrap onto a second line on a phone, and with
+   * row-gap 0 the wrapped groups would sit flush against the ones above. */
+  display: flex; flex-wrap: wrap; gap: 1.4rem 0; margin: 1.75rem 0 0;
+  padding: 1.1rem 1.35rem; background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+  border-top: 3px solid var(--brand);
+}
+/* The tiles answer three different questions -- how big the catalog is, how the models were
+ * quantized, what they were compiled for -- and a flat row left each label to carry its own
+ * subject, which "Weights" and "Compute" do not. Each group starts at its content width and
+ * takes an equal share of what is left, so the panel fills without giving a group of two
+ * tiles the room a group of three needs. */
+.count-group { flex: 1 1 auto; display: flex; flex-direction: column; gap: 0.75rem; padding: 0 1.5rem; }
+.count-group:first-child { padding-left: 0; }
+.count-group:last-child { padding-right: 0; }
+.count-group + .count-group { border-left: 1px solid var(--line); }
+/* A heading rather than another micro-label. Set in the same uppercase as the tile labels
+ * below it, the two levels read as one flat list of ten rather than as three groups. */
+.count-group h2 {
+  margin: 0; font-size: 0.9rem; font-weight: 700; color: var(--ink);
+  text-transform: none; letter-spacing: -0.01em; text-align: center;
+}
+.count-group dl { display: flex; flex-wrap: wrap; justify-content: center; gap: 1rem 1.9rem; margin: 0; }
+.counts div { display: flex; flex-direction: column; }
+.counts dt {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink-faint); font-weight: 600;
+}
+.counts dd {
+  /* Sized for the longest value rather than the shortest: the spec tiles carry a phrase
+   * where the counts carry two digits, and one size has to seat both. */
+  margin: 0.2rem 0 0; font-size: 0.8rem; font-weight: 700;
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+  white-space: nowrap;
+}
+/* A qualifier that belongs to the figure but should not compete with it. The space
+ * before it is a real character in the markup, not a margin: a margin looks right but
+ * leaves the text reading "8 TOPSper core" when copied or read aloud. */
+.counts .unit {
+  font-size: 0.72em; font-weight: 500; color: var(--ink-faint);
+  letter-spacing: 0;
+}
+
+/* ---- notes ---- */
+
+.warn { color: var(--warn-ink); }
+.small { font-size: 13px; color: var(--ink-soft); }
+
+/* ---- controls ---- */
+
+.controls {
+  display: flex; flex-wrap: wrap; gap: 0.9rem; align-items: flex-end;
+  padding: 0 0 1.1rem; border-bottom: 1px solid var(--line);
+}
+.controls label { display: flex; flex-direction: column; gap: 0.32rem; font-size: 11px; color: var(--ink-faint); }
+.controls label.grow { flex: 1 1 260px; }
+.controls span { text-transform: uppercase; letter-spacing: 0.07em; font-weight: 600; }
+.controls input[type="search"] {
+  font: inherit; font-size: 14px; color: var(--ink); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 7px; padding: 0.45rem 0.6rem;
+}
+.controls input[type="search"]:focus-visible, .controls button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--brand); outline-offset: 2px;
+}
+.controls button {
+  font: inherit; font-size: 13px; color: var(--ink-soft); background: var(--panel);
+  border: 1px solid var(--line); border-radius: 7px; padding: 0.46rem 0.85rem; cursor: pointer;
+}
+.controls button:hover { color: var(--accent); border-color: var(--brand); }
+
+.tally { font-size: 13px; color: var(--ink-faint); margin: 0.85rem 0 0; font-variant-numeric: tabular-nums; }
+
+/* ---- task sections ---- */
+
+.toc { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 1.35rem 0 0; }
+.toc a {
+  font-size: 13px; text-decoration: none; color: var(--ink-soft);
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: 999px; padding: 0.27rem 0.8rem;
+}
+.toc a:hover { color: var(--accent); border-color: var(--brand); }
+.toc a span { color: var(--ink-faint); font-variant-numeric: tabular-nums; }
+
+.task { margin: 2.5rem 0 0; scroll-margin-top: calc(var(--masthead) + 1rem); }
+.task-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 0.9rem; margin-bottom: 0.75rem; }
+.task-head h2 { font-size: 1.15rem; margin: 0; letter-spacing: -0.015em; font-weight: 700; }
+.task-head p { margin: 0; font-size: 13px; color: var(--ink-faint); }
+
+/* ---- tables ---- */
+
+.scroll {
+  overflow-x: auto;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+thead th {
+  /* Not sticky. The .scroll wrapper needs overflow-x for wide tables, which makes
+   * overflow-y compute to auto as well, so that box -- not the viewport -- becomes the
+   * containing scrollport: a sticky header then offsets itself inside the table and covers
+   * the first data row instead of parking under the masthead. */
+  background: var(--panel);
+  font-size: 10.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.06em;
+  color: var(--ink-faint); text-align: left;
+  /* A brand-blue rule under the header, the same in both modes, so the tables carry the
+   * company colour where the eye actually lands. */
+  padding: 0.75rem 0.85rem; border-bottom: 2px solid var(--brand);
+  /* Long labels wrap rather than stretching the table past the viewport; balance keeps
+   * the two lines even, and bottom alignment lines every header up on its last line. */
+  white-space: normal; text-wrap: balance; vertical-align: bottom; max-width: 9rem;
+}
+tbody th, tbody td {
+  padding: 0.58rem 0.85rem; border-bottom: 1px solid var(--line-soft);
+  text-align: left; font-weight: 400; white-space: nowrap;
+}
+tbody th { font-weight: 600; }
+tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
+tbody tr:hover { background: var(--accent-soft); }
+.num { font-variant-numeric: tabular-nums; }
+.pending { color: var(--ink-faint); }
+thead .pending { cursor: help; }
+
+/* The detail tables carry a handful of short labels, unlike the ten-column model table,
+ * so their headers do not need the width cap that forces wrapping. */
+.detail thead th { max-width: none; }
+
+.empty { font-size: 13px; color: var(--ink-faint); padding: 0.9rem 0 0; margin: 0; }
+
+
+/* ---- panels and pairs ---- */
+
+.panels { display: grid; grid-template-columns: repeat(auto-fit, minmax(290px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+.panel {
+  background: var(--panel); border: 1px solid var(--line);
+  border-radius: var(--radius); padding: 1.15rem 1.35rem; box-shadow: var(--shadow);
+}
+.panel h2, section > h2 {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--ink-faint); margin: 0 0 0.85rem; font-weight: 700;
+}
+section > h2 { margin-top: 2.5rem; }
+
+/* A definition list straight after a table needs air; without it the first label sits
+ * flush against the table's bottom border. */
+.scroll + .pairs { margin-top: 1.5rem; }
+.pairs { display: grid; grid-template-columns: auto 1fr; gap: 0.42rem 1.25rem; margin: 0; font-size: 14px; }
+.pairs.wide { grid-template-columns: 14rem 1fr; }
+.pairs dt { color: var(--ink-faint); }
+.pairs dd { margin: 0; font-variant-numeric: tabular-nums; min-width: 0; }
+/* Paths and hashes here sit outside any .scroll wrapper, and a 55-character path with no
+ * spaces would otherwise push the whole page sideways on a phone. */
+.pairs dd code { overflow-wrap: anywhere; }
+.hash { font-size: 12.5px; }
+.break { word-break: break-all; }
+
+details { margin: 0.8rem 0 0; }
+summary { cursor: pointer; font-size: 13px; color: var(--accent); }
+
+.crumbs { padding: 1.35rem 0 0; font-size: 13px; color: var(--ink-faint); }
+.crumbs a { color: var(--ink-soft); text-decoration: none; }
+.crumbs a:hover { color: var(--accent); }
+
+/* ---- footer ---- */
+
+.foot { padding: 3rem 1.5rem 2.5rem; margin-top: 3rem; border-top: 1px solid var(--line); }
+.foot p { margin: 0.2rem 0; font-size: 12.5px; color: var(--ink-faint); }
+.foot .logo-foot { height: 18px; width: auto; opacity: 0.55; margin-bottom: 0.6rem; display: block; }
+
+@media (max-width: 640px) {
+  .pairs, .pairs.wide { grid-template-columns: 1fr; gap: 0 0; }
+  .pairs dt { margin-top: 0.55rem; font-size: 12px; }
+  /* Stacked, so the rule between groups has to turn with them. */
+  .counts { flex-direction: column; gap: 0; }
+  /* Stacked, the thirds have nothing to divide, and flex-basis 0 would be a height. */
+  .count-group { flex: 0 0 auto; padding: 0; }
+  .count-group + .count-group {
+    border-left: 0; border-top: 1px solid var(--line); padding-top: 1rem; margin-top: 1rem;
+  }
+  .count-group dl { gap: 0.9rem 1.5rem; }
+  .hero { padding: 1.75rem 0 1.25rem; }
+  h1 { font-size: 1.6rem; }
+  /* The wordmark alone is 160px; with the product label beside it and the nav the
+   * masthead overflows a phone and drags the whole page sideways. The h1 immediately
+   * below names the page, so the label is the part that goes. */
+  .brand .divider, .brand .product { display: none; }
+  .masthead .wrap { gap: 1rem; }
+  .masthead nav { gap: 0.9rem; }
+  /* Long labels already wrap; on a phone let them go narrower before the table scrolls. */
+  thead th { max-width: 7rem; }
+}
+
+/* At 320px the wordmark and the nav together still do not fit, so both step down. */
+@media (max-width: 380px) {
+  .brand img { height: 18px; }
+  .masthead nav { font-size: 13px; gap: 0.75rem; }
+}
+
+@media print {
+  .masthead, .controls, .toc, .tally { display: none; }
+  .scroll, .panel, .counts { box-shadow: none; }
+  body { background: #fff; }
+}

@@ -1,769 +1,1446 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-	<title>Enlight Classic NPU :: Model Zoo</title>
-	<style>
-		html {
-			font-family: tahoma;
-			padding: 30px;
-		}
-
-		table {
-			border-collapse: collapse;
-		}
-
-		th, td {
-			text-align: center;
-			padding: 10px
-		}
-
-		th {
-			border-bottom: 1px solid #000;
-		}
-
-		td {
-			border-bottom: 1px solid #d0d0d0;
-		}
-
-		li {
-			padding: 5px;
-		}
-
-		a {
-			color: #58a6ff;
-			text-decoration: none;
-		}
-
-		a:hover {
-			text-decoration: underline;
-		}
-
-		h2 {
-			margin-top: 40px;
-		}
-
-		h3 {
-			margin-top: 30px;
-		}
-
-		@media (prefers-color-scheme: dark) {
-			html {
-				color: #eee;
-				background-color: #333;
-			}
-
-			th {
-				border-bottom: 1px solid #ccc;
-			}
-
-			td {
-				border-bottom: 1px solid #808080;
-			}
-		}
-
-	</style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Enlight Pro Model Zoo</title>
+<link rel="icon" type="image/png" href="assets/logo/mark-32.png">
+<link rel="apple-touch-icon" href="assets/logo/mark-180.png">
+<link rel="stylesheet" href="static/fonts.css">
+<link rel="stylesheet" href="static/zoo.css">
 </head>
 <body>
 
-<h1>Enlight Classic NPU :: Model Zoo</h1>
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img src="assets/logo/wordmark-88.png" alt="OPENEDGES">
+      <span class="divider"></span>
+      <span class="product">Enlight Pro Model Zoo</span>
+    </a>
+    <nav>
+      <a href="index.html">Models</a>
+      <a href="run.html">Evaluation setup</a>
+    </nav>
+  </div>
+</header>
 
-<ul>
-	<li><a href="#classification_networks">Classification Networks</a></li>
-	<li><a href="#object_detection_networks">Object Detection Networks</a></li>
-	<li><a href="#semantic_segmentation_networks">Semantic Segmentation Networks</a></li>
-	<li><a href="#instance_segmentation_networks">Instance Segmentation Networks</a></li>
-	<li><a href="#face_detection_networks">Face Detection Networks</a></li>
-	<li><a href="#pose_estimation_networks">Pose Estimation Networks</a></li>
-	<li><a href="#lane_detection_networks">Lane Detection Networks</a></li>
-	<li><a href="#mono_depth_estimation_networks">Monocular Depth Estimation Networks</a></li>
-</ul>
+<main class="wrap">
 
-<h2 id="classification_networks">Classification Networks</h2>
-	
-<h3>ImageNet Results</h3>
+  <section class="hero">
+    <h1>Enlight Pro Model Zoo</h1>
+    <div class="counts">
+      <section class="count-group">
+        <h2>Catalog</h2>
+        <dl>
+          <div><dt>Models</dt><dd>87</dd></div>
+          <div><dt>Tasks</dt><dd>5</dd></div>
+        </dl>
+      </section>
+      <section class="count-group">
+        <h2>Quantization</h2>
+        <dl>
+          <div><dt>Weights</dt><dd>INT8 <span class="unit">per-channel</span></dd></div>
+          <div><dt>Activations</dt><dd>INT8 <span class="unit">per-tensor</span></dd></div>
+        </dl>
+      </section>
+      <section class="count-group">
+        <h2>NPU HW</h2>
+        <dl>
+          <div><dt>Compute</dt><dd>8 TOPS <span class="unit">per core</span></dd></div>
+          <div><dt>MAC array</dt><dd>4K <span class="unit">at 1 GHz</span></dd></div>
+          <div><dt>Internal memory</dt><dd>2 MB <span class="unit">per core</span></dd></div>
+        </dl>
+      </section>
+    </div>
+  </section>
 
-<div>
-		
-	<table width="1280">
-	<thead>
-		<tr>
-			<th>Model Name</th>
-			<th>Type</th>
-			<th>Input Size</th>
-			<th>Top1 Acc (FP32)</th>
-			<th>Top5 Acc (FP32)</th>
-			<th>Top1 Acc (INT8)</th>
-			<th>Top5 Acc (INT8)</th>
-			<th>Giga MAC</th>
-			<!-- th>FPS</th -->
-			<th>Preview</th>
-			<th>Source</th>
-		</tr>
-	</thead> 
-	<tr>
-		<td>mobilenet_v2</td>
-		<td>TFLITE</td>
-		<td>224x224</td>
-		<td>71.090</td>
-		<td>90.272</td>
-		<td>69.738</td>
-		<td>89.482</td>
-		<td>0.3</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_1.0_224.tgz">google</a></td>
-	</tr>
-	<tr>
-		<td>mobilenet_v2</td>
-		<td>ONNX</td>
-		<td>224x224</td>
-		<td>71.190</td>
-		<td>90.206</td>
-		<td>68.966</td>
-		<td>88.676</td>
-		<td>0.3</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
-	</tr>
-	<tr>
-		<td>mobilenet_v2</td>
-		<td>ONNX</td>
-		<td>224x224</td>
-		<td>70.958</td>
-		<td>89.938</td>
-		<td>69.422</td>
-		<td>88.912</td>
-		<td>0.4</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://github.com/onnx/models/blob/master/vision/classification/mobilenet/model/mobilenetv2-7.onnx">onnx</a></td>
-	</tr>
-	<tr>
-		<td>mobilenet_v2_1.4</td>
-		<td>TFLITE</td>
-		<td>224x224</td>
-		<td>74.184</td>
-		<td>91.920</td>
-		<td>74.180</td>
-		<td>91.922</td>
-		<td>0.6</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://storage.googleapis.com/mobilenet_v2/checkpoints/mobilenet_v2_1.4_224.tgz">google</a></td>
-	</tr>
-	<tr>
-		<td>resnet18</td>
-		<td>ONNX</td>
-		<td>224x224</td>
-		<td>68.918</td>
-		<td>88.826</td>
-		<td>67.002</td>
-		<td>87.628</td>
-		<td>1.8</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
-	</tr>
-	<tr>
-		<td>resnet34</td>
-		<td>ONNX</td>
-		<td>224x224</td>
-		<td>72.770</td>
-		<td>90.966</td>
-		<td>71.020</td>
-		<td>90.024</td>
-		<td>3.7</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
-	</tr>
-	<tr>
-		<td>resnet50</td>
-		<td>ONNX</td>
-		<td>224x224</td>
-		<td>75.590</td>
-		<td>92.784</td>
-		<td>74.216</td>
-		<td>91.922</td>
-		<td>4.1</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://github.com/pytorch/vision/tree/main/torchvision">torchvision</a></td>
-	</tr>
-	<tr>
-		<td>efficientnet-lite-b0</td>
-		<td>TFLITE</td>
-		<td>224x224</td>
-		<td>73.558</td>
-		<td>91.578</td>
-		<td>71.606</td>
-		<td>90.522</td>
-		<td>1.7</td>
-		<!--td></td -->
-		<td></td>
-		<td><a href="https://github.com/tensorflow/tpu/tree/master/models/official/efficientnet/lite">google</a></td>
-	</tr>
-	</table>
-		
-</div>
+  <section class="controls">
+    <label class="grow">
+      <span>Search</span>
+      <input type="search" id="q" placeholder="Model name, dataset, source&hellip;" autocomplete="off">
+    </label>
+    <button type="button" id="reset">Clear</button>
+  </section>
 
+  <p class="tally" id="tally"></p>
 
-<h2 id="object_detection_networks">Object Detection Networks</h2>
-	
-<h3>VOC2007 Results</h3> 
-	
-<div>
-		
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>mAP (FP32)</th>
-				<th>mAP (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead> 
-		<tr>
-			<td rowspan="3">ssd_mobilenet_v2</td>
-			<td rowspan="3">ONNX</td>
-			<td>300x300</td>
-			<td>70.7</td>
-			<td>70.1</td>
-			<td>0.7</td>
-			<!-- td></td -->
-			<td><a href="/viewer/?url=https://raw.githubusercontent.com/openedges/openedges.github.io/main/samples/ssdlite300.enlight">preview</a></td>
-			<td rowspan="3">in-house</td>
-		</tr>
-		<tr>
-			<td>320x320</td>
-			<td></td>
-			<td></td>
-			<td>0.8</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td>512x512</td>
-			<td>74.8</td>
-			<td>74.0</td>
-			<td>1.9</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<!-- tr>
-			<td rowspan="3">ssd_mobilenet_v2 (focalloss)</td>
-			<td rowspan="3">ONNX</td>
-			<td>300x300</td>
-			<td></td>
-			<td></td>
-			<td>0.7</td>
-			<td><a href="/viewer/?url=https://raw.githubusercontent.com/openedges/openedges.github.io/main/samples/ssdlite300.enlight">preview</a></td>
-			<td rowspan="3">in-house</td>
-		</tr>
-		<tr>
-			<td>320x320</td>
-			<td></td>
-			<td></td>
-			<td>0.8</td>
-			<td></td>
-		</tr>
-		<tr>
-			<td>512x512</td>
-			<td></td>
-			<td></td>
-			<td>1.9</td>
-			<td></td>
-		</tr -->
-		<tr>
-			<td>YOLOv2-voc*</td>
-			<td>DarkNet</td>
-			<td>416x416</td>
-			<td>75.5</td>
-			<td>74.8</td>
-			<td>14.7</td>
-			<!-- td></td -->
-			<td></td>
-			<td>in-house</td>
-		</tr>
-		<tr>
-			<td>YOLOv2-tiny-voc</td>
-			<td>DarkNet</td>
-			<td>416x416</td>
-			<td>55.6</td>
-			<td>55.4</td>
-			<td>3.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2-tiny-voc.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov2-tiny-voc.weights">weights</a></td>
-		</tr>
-	</table>
+  <nav class="toc">
+    <a href="#image-classification">Image Classification <span>19</span></a>
+    <a href="#object-detection">Object Detection <span>34</span></a>
+    <a href="#instance-segmentation">Instance Segmentation <span>16</span></a>
+    <a href="#semantic-segmentation">Semantic Segmentation <span>3</span></a>
+    <a href="#pose-estimation">Pose Estimation <span>15</span></a>
+  </nav>
 
-	<p>* YOLOv2 is trained after replacing buggy reorg layer to reorg3d layer.</p>			
-</div>
-	
-<h3>COCO2017 Results</h3>
-	
-<div>
-		
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>AP (FP32)</th>
-				<th>AP (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td>ssd_mobilenet_v2_320x320</td>
-			<td>TFLITE</td>
-			<td>320x320</td>
-			<td>33.6@IoU=0.5<br />19.2@IoU=0.5:0.95</td>
-			<td></td>
-			<td></td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="http://download.tensorflow.org/models/object_detection/tf2/20200711/ssd_mobilenet_v2_320x320_coco17_tpu-8.tar.gz">link</a></td>
-		</tr> 
-		<tr>
-			<td>YOLOv2* </td>
-			<td>DarkNet</td>
-			<td>416x416</td>
-			<td>54.8@IoU=0.5<br />28.2@IoU=0.5:0.95</td>
-			<td>54.2@IoU=0.5<br />27.5@IoU=0.5:0.95</td>
-			<td>31.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td>in-house</td>
-		</tr>
-		<tr>
-			<td>YOLOv2-tiny</td>
-			<td>DarkNet</td>
-			<td>416x416</td>
-			<td>25.9@IoU=0.5<br />10.0@IoU=0.5:0.95</td>
-			<td>25.5@IoU=0.5<br />9.7@IoU=0.5:0.95</td>
-			<td>2.7</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov2-tiny.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov2-tiny.weights">weights</a></td>
-		</tr>
-		<tr>
-			<td rowspan="3">YOLOv3</td>
-			<td rowspan="3">DarkNet</td>
-			<td>320x320</td>
-			<td>62.7@IoU=0.5<br />34.6@IoU=0.5:0.95</td>
-			<td>62.9@IoU=0.5<br />34.6@IoU=0.5:0.95</td>
-			<td>19.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td rowspan="3"><a href="https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov3.weights">weights</a></td>
-		</tr>
-		<tr>
-			<td>416x416</td>
-			<td>67.1@IoU=0.5<br />37.6@IoU=0.5:0.95</td>
-			<td>67.7@IoU=0.5<br />37.9@IoU=0.5:0.95</td>
-			<td>32.9</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td>608x608</td>
-			<td>68.0@IoU=0.5<br />38.3@IoU=0.5:0.95</td>
-			<td>68.9@IoU=0.5<br />38.7@IoU=0.5:0.95</td>
-			<td>70.3</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td>YOLOv3-tiny</td>
-			<td>DarkNet</td>
-			<td>416x416</td>
-			<td>20.0@IoU=0.5<br />9.3@IoU=0.5:0.95</td>
-			<td>19.7@IoU=0.5<br />9.1@IoU=0.5:0.95</td>
-			<td>2.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-tiny.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov3-tiny.weights">weights</a></td>
-		</tr>
-		<tr>
-			<td>YOLOv3-spp</td>
-			<td>DarkNet</td>
-			<td>608x608</td>
-			<td>69.9@IoU=0.5<br />42.0@IoU=0.5:0.95</td>
-			<td>69.3@IoU=0.5<br />41.3@IoU=0.5:0.95</td>
-			<td>70.7</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://raw.githubusercontent.com/pjreddie/darknet/master/cfg/yolov3-spp.cfg">cfg</a>, <a href="https://pjreddie.com/media/files/yolov3-spp.weights">weights</a></td>
-		</tr>
-		<tr>
-			<td rowspan="4">YOLOv4</td>
-			<td rowspan="4">DarkNet</td>
-			<td>320x320</td>
-			<td>62.5@IoU=0.5<br />39.7@IoU=0.5:0.95</td>
-			<td>62.2@IoU=0.5<br />39.0@IoU=0.5:0.95</td>
-			<td>17.8</td>
-			<!-- td></td -->
-			<td></td>
-			<td rowspan="4"><a href="https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4.cfg">cfg</a>, <a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v3_optimal/yolov4.weights">weights</a></td>
-		</tr>
-		<tr>
-			<td>416x416</td>
-			<td>70.5@IoU=0.5<br />46.1@IoU=0.5:0.95</td>
-			<td>70.2@IoU=0.5<br />45.3@IoU=0.5:0.95</td>
-			<td>30.1</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td>512x512</td>
-			<td>73.6@IoU=0.5<br />48.8@IoU=0.5:0.95</td>
-			<td>72.9@IoU=0.5<br />47.8@IoU=0.5:0.95</td>
-			<td>45.5</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td>608x608</td>
-			<td>74.6@IoU=0.5<br />49.8@IoU=0.5:0.95</td>
-			<td>74.3@IoU=0.5<br />48.5@IoU=0.5:0.95</td>
-			<td>64.2</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td rowspan="2">YOLOv4-csp</td>
-			<td rowspan="2">DarkNet</td>
-			<td>512x512</td>
-			<td>64.2@IoU=0.5<br />45.2@IoU=0.5:0.95</td>
-			<td>63.8@IoU=0.5<br />43.6@IoU=0.5:0.95</td>
-			<td>38.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td rowspan="2"><a href="https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-csp.cfg">cfg</a>, <a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-csp.weights">weights</a></td>
-		</tr>
-		<tr>
-			<td>608x608</td>
-			<td>65.4@IoU=0.5<br />46.2@IoU=0.5:0.95</td>
-			<td>65.0@IoU=0.5<br />44.5@IoU=0.5:0.95</td>
-			<td>45.7</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-		<tr>
-			<td>YOLOv4-tiny </td>
-			<td>DarkNet</td>
-			<td>416x416</td>
-			<td>41.4@IoU=0.5<br />21.4@IoU=0.5:0.95</td>
-			<td>40.7@IoU=0.5<br />20.7@IoU=0.5:0.95</td>
-			<td>3.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://raw.githubusercontent.com/AlexeyAB/darknet/master/cfg/yolov4-tiny.cfg">cfg</a>, <a href="https://github.com/AlexeyAB/darknet/releases/download/darknet_yolo_v4_pre/yolov4-tiny.weights">weights</a></td>
-		</tr>
-	</table>
-</div>
+  <section class="task" id="image-classification">
+    <div class="task-head">
+      <h2>Image Classification</h2>
+      <p><span class="shown">19</span> models</p>
+    </div>
 
-<p>* YOLOv2 is trained after replacing buggy reorg layer to reorg3d layer.</p>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Network</th>
+            <th>Input Resolution</th>
+            <th>Param Size (M)</th>
+            <th>Source</th>
+            <th>Dataset</th>
+            <th>Accuracy Metric</th>
+            <th>FP32 Original Accuracy</th>
+            <th>Int8 Quantized Accuracy</th>
+            <th>Inference time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-key="vgg16"
+              data-search="vgg16 imagenet onnx model zoo onnxzoo_cls">
+            <th>vgg16</th>
+            <td class="num">224x224</td>
+            <td class="num">138.36</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">72.0</td>
+            <td class="num">71.9</td>
+            <td class="num" title="15860330 cycles at 1000 MHz, 63.05 FPS">15.86</td>
+          </tr>
+          <tr data-key="vgg16-bn"
+              data-search="vgg16-bn imagenet onnx model zoo onnxzoo_cls">
+            <th>vgg16-bn</th>
+            <td class="num">224x224</td>
+            <td class="num">138.36</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">72.3</td>
+            <td class="num">72.3</td>
+            <td class="num" title="15860330 cycles at 1000 MHz, 63.05 FPS">15.86</td>
+          </tr>
+          <tr data-key="vgg19"
+              data-search="vgg19 imagenet onnx model zoo onnxzoo_cls">
+            <th>vgg19</th>
+            <td class="num">224x224</td>
+            <td class="num">143.67</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">73.3</td>
+            <td class="num">73.0</td>
+            <td class="num" title="17132862 cycles at 1000 MHz, 58.37 FPS">17.13</td>
+          </tr>
+          <tr data-key="vgg19-bn"
+              data-search="vgg19-bn imagenet onnx model zoo onnxzoo_cls">
+            <th>vgg19-bn</th>
+            <td class="num">224x224</td>
+            <td class="num">143.67</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">73.5</td>
+            <td class="num">73.4</td>
+            <td class="num" title="17132862 cycles at 1000 MHz, 58.37 FPS">17.13</td>
+          </tr>
+          <tr data-key="resnet18"
+              data-search="resnet18 imagenet onnx model zoo onnxzoo_cls">
+            <th>resnet18</th>
+            <td class="num">224x224</td>
+            <td class="num">12.20</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">69.1</td>
+            <td class="num">69.1</td>
+            <td class="num" title="2244395 cycles at 1000 MHz, 445.55 FPS">2.24</td>
+          </tr>
+          <tr data-key="resnet34"
+              data-search="resnet34 imagenet onnx model zoo onnxzoo_cls">
+            <th>resnet34</th>
+            <td class="num">224x224</td>
+            <td class="num">22.30</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">72.7</td>
+            <td class="num">72.7</td>
+            <td class="num" title="3409490 cycles at 1000 MHz, 293.3 FPS">3.41</td>
+          </tr>
+          <tr data-key="resnet50"
+              data-search="resnet50 imagenet onnx model zoo onnxzoo_cls">
+            <th>resnet50</th>
+            <td class="num">224x224</td>
+            <td class="num">27.58</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">74.1</td>
+            <td class="num">73.9</td>
+            <td class="num" title="5663682 cycles at 1000 MHz, 176.56 FPS">5.66</td>
+          </tr>
+          <tr data-key="resnet101"
+              data-search="resnet101 imagenet onnx model zoo onnxzoo_cls">
+            <th>resnet101</th>
+            <td class="num">224x224</td>
+            <td class="num">46.54</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">75.7</td>
+            <td class="num">75.4</td>
+            <td class="num" title="9670465 cycles at 1000 MHz, 103.41 FPS">9.67</td>
+          </tr>
+          <tr data-key="resnet152"
+              data-search="resnet152 imagenet onnx model zoo onnxzoo_cls">
+            <th>resnet152</th>
+            <td class="num">224x224</td>
+            <td class="num">62.17</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">76.0</td>
+            <td class="num">75.3</td>
+            <td class="num" title="13568954 cycles at 1000 MHz, 73.7 FPS">13.57</td>
+          </tr>
+          <tr data-key="densenet121"
+              data-search="densenet121 imagenet onnx model zoo onnxzoo_cls">
+            <th>densenet121</th>
+            <td class="num">224x224</td>
+            <td class="num">8.09</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">61.0</td>
+            <td class="num">57.6</td>
+            <td class="num" title="7629372 cycles at 1000 MHz, 131.07 FPS">7.63</td>
+          </tr>
+          <tr data-key="efficientnet-lite4"
+              data-search="efficientnet-lite4 imagenet timm timm_efficientnet">
+            <th>efficientnet-lite4</th>
+            <td class="num">380x380</td>
+            <td class="num">12.95</td>
+            <td>
+              <a href="https://huggingface.co/timm/tf_efficientnet_lite4.in1k" rel="noopener noreferrer" target="_blank">timm</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">81.3</td>
+            <td class="num">81.2</td>
+            <td class="num" title="31111785 cycles at 1000 MHz, 32.14 FPS">31.11</td>
+          </tr>
+          <tr data-key="squeezenet1.1"
+              data-search="squeezenet1.1 imagenet onnx model zoo onnxzoo_cls">
+            <th>squeezenet1.1</th>
+            <td class="num">224x224</td>
+            <td class="num">1.24</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">56.4</td>
+            <td class="num">56.0</td>
+            <td class="num" title="1518555 cycles at 1000 MHz, 658.52 FPS">1.52</td>
+          </tr>
+          <tr data-key="efficientnet-b0"
+              data-search="efficientnet-b0 imagenet onnx model zoo onnxzoo_cls">
+            <th>efficientnet-b0</th>
+            <td class="num">224x224</td>
+            <td class="num">6.55</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">77.7</td>
+            <td class="num">77.0</td>
+            <td class="num" title="8997627 cycles at 1000 MHz, 111.14 FPS">9.00</td>
+          </tr>
+          <tr data-key="efficientnet-b2"
+              data-search="efficientnet-b2 imagenet onnx model zoo onnxzoo_cls">
+            <th>efficientnet-b2</th>
+            <td class="num">256x256</td>
+            <td class="num">10.48</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">79.4</td>
+            <td class="num">79.0</td>
+            <td class="num" title="19096714 cycles at 1000 MHz, 52.37 FPS">19.10</td>
+          </tr>
+          <tr data-key="efficientnet-b3"
+              data-search="efficientnet-b3 imagenet onnx model zoo onnxzoo_cls">
+            <th>efficientnet-b3</th>
+            <td class="num">288x288</td>
+            <td class="num">13.73</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">81.4</td>
+            <td class="num">80.7</td>
+            <td class="num" title="23148025 cycles at 1000 MHz, 43.2 FPS">23.15</td>
+          </tr>
+          <tr data-key="efficientnet-b4"
+              data-search="efficientnet-b4 imagenet onnx model zoo onnxzoo_cls">
+            <th>efficientnet-b4</th>
+            <td class="num">320x320</td>
+            <td class="num">21.07</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">82.6</td>
+            <td class="num">82.1</td>
+            <td class="num" title="34661985 cycles at 1000 MHz, 28.85 FPS">34.66</td>
+          </tr>
+          <tr data-key="efficientnet-b5"
+              data-search="efficientnet-b5 imagenet onnx model zoo onnxzoo_cls">
+            <th>efficientnet-b5</th>
+            <td class="num">448x448</td>
+            <td class="num">32.35</td>
+            <td>
+              <a href="https://github.com/onnx/models" rel="noopener noreferrer" target="_blank">ONNX Model Zoo</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">85.4</td>
+            <td class="num">84.8</td>
+            <td class="num" title="99717019 cycles at 1000 MHz, 10.03 FPS">99.72</td>
+          </tr>
+          <tr data-key="mobilenet_v3_large"
+              data-search="mobilenet_v3_large imagenet torchvision torchvision">
+            <th>mobilenet_v3_large</th>
+            <td class="num">224x224</td>
+            <td class="num">5.47</td>
+            <td>
+              <a href="https://github.com/pytorch/vision" rel="noopener noreferrer" target="_blank">torchvision</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">75.3</td>
+            <td class="num">74.9</td>
+            <td class="num" title="5067627 cycles at 1000 MHz, 197.33 FPS">5.07</td>
+          </tr>
+          <tr data-key="mobilenet_v3_small"
+              data-search="mobilenet_v3_small imagenet torchvision torchvision">
+            <th>mobilenet_v3_small</th>
+            <td class="num">224x224</td>
+            <td class="num">2.54</td>
+            <td>
+              <a href="https://github.com/pytorch/vision" rel="noopener noreferrer" target="_blank">torchvision</a>
+            </td>
+            <td>ImageNet</td>
+            <td><code>top1</code></td>
+            <td class="num">67.7</td>
+            <td class="num">66.4</td>
+            <td class="num" title="2777387 cycles at 1000 MHz, 360.05 FPS">2.78</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<h2 id="semantic_segmentation_networks">Semantic Segmentation Networks</h2>
+    <p class="empty" hidden>Nothing in this task matches the filters.</p>
+  </section>
+  <section class="task" id="object-detection">
+    <div class="task-head">
+      <h2>Object Detection</h2>
+      <p><span class="shown">34</span> models</p>
+    </div>
 
-<h3>Cityscape Results</h3>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Network</th>
+            <th>Input Resolution</th>
+            <th>Param Size (M)</th>
+            <th>Source</th>
+            <th>Dataset</th>
+            <th>Accuracy Metric</th>
+            <th>FP32 Original Accuracy</th>
+            <th>Int8 Quantized Accuracy</th>
+            <th>Inference time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-key="mb2-ssd-lite"
+              data-search="mb2-ssd-lite voc0712 oenpu/mb2_ssd_lite_onnx hf_ssd">
+            <th>mb2-ssd-lite</th>
+            <td class="num">300x300</td>
+            <td class="num">3.36</td>
+            <td>
+              <a href="https://huggingface.co/oenpu/mb2_ssd_lite_onnx" rel="noopener noreferrer" target="_blank">oenpu/mb2_ssd_lite_onnx</a>
+            </td>
+            <td>VOC0712</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">43.9</td>
+            <td class="num">43.5</td>
+            <td class="num" title="7875227 cycles at 1000 MHz, 126.98 FPS">7.88</td>
+          </tr>
+          <tr data-key="tf-efficientdet-lite1"
+              data-search="tf-efficientdet-lite1 coco rwightman/efficientdet-pytorch efficientdet">
+            <th>tf-efficientdet-lite1</th>
+            <td class="num">384x384</td>
+            <td class="num">4.40</td>
+            <td>
+              <a href="https://github.com/rwightman/efficientdet-pytorch" rel="noopener noreferrer" target="_blank">rwightman/efficientdet-pytorch</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">28.1</td>
+            <td class="num">28.1</td>
+            <td class="num" title="35038764 cycles at 1000 MHz, 28.54 FPS">35.04</td>
+          </tr>
+          <tr data-key="tf-efficientdet-lite3"
+              data-search="tf-efficientdet-lite3 coco rwightman/efficientdet-pytorch efficientdet">
+            <th>tf-efficientdet-lite3</th>
+            <td class="num">512x512</td>
+            <td class="num">9.11</td>
+            <td>
+              <a href="https://github.com/rwightman/efficientdet-pytorch" rel="noopener noreferrer" target="_blank">rwightman/efficientdet-pytorch</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">35.4</td>
+            <td class="num">35.2</td>
+            <td class="num" title="80117483 cycles at 1000 MHz, 12.48 FPS">80.12</td>
+          </tr>
+          <tr data-key="tf-efficientdet-lite4"
+              data-search="tf-efficientdet-lite4 coco rwightman/efficientdet-pytorch efficientdet">
+            <th>tf-efficientdet-lite4</th>
+            <td class="num">640x640</td>
+            <td class="num">16.64</td>
+            <td>
+              <a href="https://github.com/rwightman/efficientdet-pytorch" rel="noopener noreferrer" target="_blank">rwightman/efficientdet-pytorch</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">39.9</td>
+            <td class="num">39.8</td>
+            <td class="num" title="163103025 cycles at 1000 MHz, 6.13 FPS">163.10</td>
+          </tr>
+          <tr data-key="yolov5n"
+              data-search="yolov5n coco ultralytics yolov5">
+            <th>yolov5n</th>
+            <td class="num">640x640</td>
+            <td class="num">1.87</td>
+            <td>
+              <a href="https://github.com/ultralytics/yolov5" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">27.2</td>
+            <td class="num">26.1</td>
+            <td class="num" title="10613115 cycles at 1000 MHz, 94.22 FPS">10.61</td>
+          </tr>
+          <tr data-key="yolov5s"
+              data-search="yolov5s coco ultralytics yolov5">
+            <th>yolov5s</th>
+            <td class="num">640x640</td>
+            <td class="num">7.23</td>
+            <td>
+              <a href="https://github.com/ultralytics/yolov5" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">36.8</td>
+            <td class="num">35.5</td>
+            <td class="num" title="12764131 cycles at 1000 MHz, 78.34 FPS">12.76</td>
+          </tr>
+          <tr data-key="yolov5m"
+              data-search="yolov5m coco ultralytics yolov5">
+            <th>yolov5m</th>
+            <td class="num">640x640</td>
+            <td class="num">21.17</td>
+            <td>
+              <a href="https://github.com/ultralytics/yolov5" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">44.6</td>
+            <td class="num">43.1</td>
+            <td class="num" title="22985973 cycles at 1000 MHz, 43.5 FPS">22.99</td>
+          </tr>
+          <tr data-key="yolov5l"
+              data-search="yolov5l coco ultralytics yolov5">
+            <th>yolov5l</th>
+            <td class="num">640x640</td>
+            <td class="num">46.53</td>
+            <td>
+              <a href="https://github.com/ultralytics/yolov5" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">48.4</td>
+            <td class="num">45.9</td>
+            <td class="num" title="34552128 cycles at 1000 MHz, 28.94 FPS">34.55</td>
+          </tr>
+          <tr data-key="yolov5x"
+              data-search="yolov5x coco ultralytics yolov5">
+            <th>yolov5x</th>
+            <td class="num">640x640</td>
+            <td class="num">86.71</td>
+            <td>
+              <a href="https://github.com/ultralytics/yolov5" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">50.1</td>
+            <td class="num">48.4</td>
+            <td class="num" title="68581436 cycles at 1000 MHz, 14.58 FPS">68.58</td>
+          </tr>
+          <tr data-key="yolov8n"
+              data-search="yolov8n coco ultralytics yolov8">
+            <th>yolov8n</th>
+            <td class="num">640x640</td>
+            <td class="num">3.19</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">36.8</td>
+            <td class="num">36.5</td>
+            <td class="num" title="9797419 cycles at 1000 MHz, 102.07 FPS">9.80</td>
+          </tr>
+          <tr data-key="yolov8s"
+              data-search="yolov8s coco ultralytics yolov8">
+            <th>yolov8s</th>
+            <td class="num">640x640</td>
+            <td class="num">11.20</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">44.4</td>
+            <td class="num">44.2</td>
+            <td class="num" title="12583008 cycles at 1000 MHz, 79.47 FPS">12.58</td>
+          </tr>
+          <tr data-key="yolov8m"
+              data-search="yolov8m coco ultralytics yolov8">
+            <th>yolov8m</th>
+            <td class="num">640x640</td>
+            <td class="num">25.93</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">49.7</td>
+            <td class="num">49.6</td>
+            <td class="num" title="25270805 cycles at 1000 MHz, 39.57 FPS">25.27</td>
+          </tr>
+          <tr data-key="yolov8l"
+              data-search="yolov8l coco ultralytics yolov8">
+            <th>yolov8l</th>
+            <td class="num">640x640</td>
+            <td class="num">43.71</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">52.2</td>
+            <td class="num">52.0</td>
+            <td class="num" title="38413072 cycles at 1000 MHz, 26.03 FPS">38.41</td>
+          </tr>
+          <tr data-key="yolov8x"
+              data-search="yolov8x coco ultralytics yolov8">
+            <th>yolov8x</th>
+            <td class="num">640x640</td>
+            <td class="num">68.24</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">53.3</td>
+            <td class="num">53.2</td>
+            <td class="num" title="66979993 cycles at 1000 MHz, 14.93 FPS">66.98</td>
+          </tr>
+          <tr data-key="yolov9t"
+              data-search="yolov9t coco ultralytics yolov9">
+            <th>yolov9t</th>
+            <td class="num">640x640</td>
+            <td class="num">2.14</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">37.5</td>
+            <td class="num">37.3</td>
+            <td class="num" title="15579921 cycles at 1000 MHz, 64.19 FPS">15.58</td>
+          </tr>
+          <tr data-key="yolov9s"
+              data-search="yolov9s coco ultralytics yolov9">
+            <th>yolov9s</th>
+            <td class="num">640x640</td>
+            <td class="num">7.24</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">45.9</td>
+            <td class="num">45.7</td>
+            <td class="num" title="17755955 cycles at 1000 MHz, 56.32 FPS">17.76</td>
+          </tr>
+          <tr data-key="yolov9m"
+              data-search="yolov9m coco ultralytics yolov9">
+            <th>yolov9m</th>
+            <td class="num">640x640</td>
+            <td class="num">20.11</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">50.8</td>
+            <td class="num">50.7</td>
+            <td class="num" title="31149515 cycles at 1000 MHz, 32.1 FPS">31.15</td>
+          </tr>
+          <tr data-key="yolov9c"
+              data-search="yolov9c coco ultralytics yolov9">
+            <th>yolov9c</th>
+            <td class="num">640x640</td>
+            <td class="num">25.42</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">52.1</td>
+            <td class="num">52.0</td>
+            <td class="num" title="43401999 cycles at 1000 MHz, 23.04 FPS">43.40</td>
+          </tr>
+          <tr data-key="yolov10n"
+              data-search="yolov10n coco thu-mig/yolov10 yolov10">
+            <th>yolov10n</th>
+            <td class="num">640x640</td>
+            <td class="num">2.34</td>
+            <td>
+              <a href="https://github.com/THU-MIG/yolov10" rel="noopener noreferrer" target="_blank">THU-MIG/yolov10</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">37.8</td>
+            <td class="num">37.3</td>
+            <td class="num" title="11662164 cycles at 1000 MHz, 85.75 FPS">11.66</td>
+          </tr>
+          <tr data-key="yolov10s"
+              data-search="yolov10s coco thu-mig/yolov10 yolov10">
+            <th>yolov10s</th>
+            <td class="num">640x640</td>
+            <td class="num">7.29</td>
+            <td>
+              <a href="https://github.com/THU-MIG/yolov10" rel="noopener noreferrer" target="_blank">THU-MIG/yolov10</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">45.5</td>
+            <td class="num">45.3</td>
+            <td class="num" title="14432132 cycles at 1000 MHz, 69.29 FPS">14.43</td>
+          </tr>
+          <tr data-key="yolov10m"
+              data-search="yolov10m coco thu-mig/yolov10 yolov10">
+            <th>yolov10m</th>
+            <td class="num">640x640</td>
+            <td class="num">15.40</td>
+            <td>
+              <a href="https://github.com/THU-MIG/yolov10" rel="noopener noreferrer" target="_blank">THU-MIG/yolov10</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">50.3</td>
+            <td class="num">47.6</td>
+            <td class="num" title="28745125 cycles at 1000 MHz, 34.79 FPS">28.75</td>
+          </tr>
+          <tr data-key="yolov10b"
+              data-search="yolov10b coco thu-mig/yolov10 yolov10">
+            <th>yolov10b</th>
+            <td class="num">640x640</td>
+            <td class="num">19.11</td>
+            <td>
+              <a href="https://github.com/THU-MIG/yolov10" rel="noopener noreferrer" target="_blank">THU-MIG/yolov10</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">51.5</td>
+            <td class="num">47.5</td>
+            <td class="num" title="31817514 cycles at 1000 MHz, 31.43 FPS">31.82</td>
+          </tr>
+          <tr data-key="yolov10l"
+              data-search="yolov10l coco thu-mig/yolov10 yolov10">
+            <th>yolov10l</th>
+            <td class="num">640x640</td>
+            <td class="num">24.41</td>
+            <td>
+              <a href="https://github.com/THU-MIG/yolov10" rel="noopener noreferrer" target="_blank">THU-MIG/yolov10</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">52.3</td>
+            <td class="num">47.3</td>
+            <td class="num" title="39563462 cycles at 1000 MHz, 25.28 FPS">39.56</td>
+          </tr>
+          <tr data-key="yolov10x"
+              data-search="yolov10x coco thu-mig/yolov10 yolov10">
+            <th>yolov10x</th>
+            <td class="num">640x640</td>
+            <td class="num">29.52</td>
+            <td>
+              <a href="https://github.com/THU-MIG/yolov10" rel="noopener noreferrer" target="_blank">THU-MIG/yolov10</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">53.5</td>
+            <td class="num">50.6</td>
+            <td class="num" title="66320132 cycles at 1000 MHz, 15.08 FPS">66.32</td>
+          </tr>
+          <tr data-key="yolo11n"
+              data-search="yolo11n coco ultralytics yolo11">
+            <th>yolo11n</th>
+            <td class="num">640x640</td>
+            <td class="num">2.66</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">38.8</td>
+            <td class="num">38.5</td>
+            <td class="num" title="11379175 cycles at 1000 MHz, 87.88 FPS">11.38</td>
+          </tr>
+          <tr data-key="yolo11s"
+              data-search="yolo11s coco ultralytics yolo11">
+            <th>yolo11s</th>
+            <td class="num">640x640</td>
+            <td class="num">9.49</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">46.1</td>
+            <td class="num">45.8</td>
+            <td class="num" title="14204134 cycles at 1000 MHz, 70.4 FPS">14.20</td>
+          </tr>
+          <tr data-key="yolo11m"
+              data-search="yolo11m coco ultralytics yolo11">
+            <th>yolo11m</th>
+            <td class="num">640x640</td>
+            <td class="num">20.13</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">50.8</td>
+            <td class="num">50.6</td>
+            <td class="num" title="27169840 cycles at 1000 MHz, 36.81 FPS">27.17</td>
+          </tr>
+          <tr data-key="yolo11l"
+              data-search="yolo11l coco ultralytics yolo11">
+            <th>yolo11l</th>
+            <td class="num">640x640</td>
+            <td class="num">25.38</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">52.7</td>
+            <td class="num">52.2</td>
+            <td class="num" title="36239384 cycles at 1000 MHz, 27.59 FPS">36.24</td>
+          </tr>
+          <tr data-key="yolo11x"
+              data-search="yolo11x coco ultralytics yolo11">
+            <th>yolo11x</th>
+            <td class="num">640x640</td>
+            <td class="num">56.96</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">54.0</td>
+            <td class="num">51.6</td>
+            <td class="num" title="67256423 cycles at 1000 MHz, 14.87 FPS">67.26</td>
+          </tr>
+          <tr data-key="yolo26n"
+              data-search="yolo26n coco ultralytics yolo26">
+            <th>yolo26n</th>
+            <td class="num">640x640</td>
+            <td class="num">2.45</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">39.7</td>
+            <td class="num">38.2</td>
+            <td class="num" title="12707594 cycles at 1000 MHz, 78.69 FPS">12.71</td>
+          </tr>
+          <tr data-key="yolo26s"
+              data-search="yolo26s coco ultralytics yolo26">
+            <th>yolo26s</th>
+            <td class="num">640x640</td>
+            <td class="num">9.54</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">47.2</td>
+            <td class="num">45.4</td>
+            <td class="num" title="15948923 cycles at 1000 MHz, 62.7 FPS">15.95</td>
+          </tr>
+          <tr data-key="yolo26m"
+              data-search="yolo26m coco ultralytics yolo26">
+            <th>yolo26m</th>
+            <td class="num">640x640</td>
+            <td class="num">20.45</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">51.9</td>
+            <td class="num">50.3</td>
+            <td class="num" title="28122460 cycles at 1000 MHz, 35.56 FPS">28.12</td>
+          </tr>
+          <tr data-key="yolo26l"
+              data-search="yolo26l coco ultralytics yolo26">
+            <th>yolo26l</th>
+            <td class="num">640x640</td>
+            <td class="num">24.85</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">53.6</td>
+            <td class="num">52.3</td>
+            <td class="num" title="36922490 cycles at 1000 MHz, 27.08 FPS">36.92</td>
+          </tr>
+          <tr data-key="yolo26x"
+              data-search="yolo26x coco ultralytics yolo26">
+            <th>yolo26x</th>
+            <td class="num">640x640</td>
+            <td class="num">55.77</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">56.4</td>
+            <td class="num">54.6</td>
+            <td class="num" title="68226219 cycles at 1000 MHz, 14.66 FPS">68.23</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<div>
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>mIoU / Pixel Acc / Mean Acc (FP32)</th>
-				<th>mIoU / Pixel Acc / Mean Acc (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td>PIDNet-S</td>
-			<td>ONNX</td>
-			<td>2048x1024</td>
-			<td>78.1 / 96.1 / 85.8</td>
-			<td>77.9 / 96.0 / 85.6</td>
-			<td>50.5</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://github.com/XuJiacong/PIDNet">link</a></td>
-		</tr>
-	</table>
-</div>
-<h2 id="instance_segmentation_networks">Instance Segmentation Networks</h2>
+    <p class="empty" hidden>Nothing in this task matches the filters.</p>
+  </section>
+  <section class="task" id="instance-segmentation">
+    <div class="task-head">
+      <h2>Instance Segmentation</h2>
+      <p><span class="shown">16</span> models</p>
+    </div>
 
-<h3>COCO2017 Results</h3>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Network</th>
+            <th>Input Resolution</th>
+            <th>Param Size (M)</th>
+            <th>Source</th>
+            <th>Dataset</th>
+            <th>Accuracy Metric</th>
+            <th>FP32 Original Accuracy</th>
+            <th>Int8 Quantized Accuracy</th>
+            <th>Inference time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-key="yolov8n-seg"
+              data-search="yolov8n-seg coco ultralytics yolov8-seg">
+            <th>yolov8n-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">3.45</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">30.1</td>
+            <td class="num">30.3</td>
+            <td class="num" title="11054837 cycles at 1000 MHz, 90.46 FPS">11.05</td>
+          </tr>
+          <tr data-key="yolov8s-seg"
+              data-search="yolov8s-seg coco ultralytics yolov8-seg">
+            <th>yolov8s-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">11.85</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">36.6</td>
+            <td class="num">37.0</td>
+            <td class="num" title="15069195 cycles at 1000 MHz, 66.36 FPS">15.07</td>
+          </tr>
+          <tr data-key="yolov8m-seg"
+              data-search="yolov8m-seg coco ultralytics yolov8-seg">
+            <th>yolov8m-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">27.31</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">40.5</td>
+            <td class="num">41.0</td>
+            <td class="num" title="29671757 cycles at 1000 MHz, 33.7 FPS">29.67</td>
+          </tr>
+          <tr data-key="yolov8l-seg"
+              data-search="yolov8l-seg coco ultralytics yolov8-seg">
+            <th>yolov8l-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">46.02</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">42.4</td>
+            <td class="num">43.1</td>
+            <td class="num" title="46230217 cycles at 1000 MHz, 21.63 FPS">46.23</td>
+          </tr>
+          <tr data-key="yolov8x-seg"
+              data-search="yolov8x-seg coco ultralytics yolov8-seg">
+            <th>yolov8x-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">71.84</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">43.2</td>
+            <td class="num">43.8</td>
+            <td class="num" title="79111602 cycles at 1000 MHz, 12.64 FPS">79.11</td>
+          </tr>
+          <tr data-key="yolov9c-seg"
+              data-search="yolov9c-seg coco ultralytics yolov9-seg">
+            <th>yolov9c-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">27.73</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">42.4</td>
+            <td class="num">42.7</td>
+            <td class="num" title="51782955 cycles at 1000 MHz, 19.31 FPS">51.78</td>
+          </tr>
+          <tr data-key="yolo11n-seg"
+              data-search="yolo11n-seg coco ultralytics yolo11-seg">
+            <th>yolo11n-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">2.91</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">32.0</td>
+            <td class="num">32.1</td>
+            <td class="num" title="12635289 cycles at 1000 MHz, 79.14 FPS">12.64</td>
+          </tr>
+          <tr data-key="yolo11s-seg"
+              data-search="yolo11s-seg coco ultralytics yolo11-seg">
+            <th>yolo11s-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">10.14</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">37.8</td>
+            <td class="num">38.2</td>
+            <td class="num" title="16691635 cycles at 1000 MHz, 59.91 FPS">16.69</td>
+          </tr>
+          <tr data-key="yolo11m-seg"
+              data-search="yolo11m-seg coco ultralytics yolo11-seg">
+            <th>yolo11m-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">22.44</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">41.7</td>
+            <td class="num">42.4</td>
+            <td class="num" title="34984960 cycles at 1000 MHz, 28.58 FPS">34.98</td>
+          </tr>
+          <tr data-key="yolo11l-seg"
+              data-search="yolo11l-seg coco ultralytics yolo11-seg">
+            <th>yolo11l-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">27.69</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">43.2</td>
+            <td class="num">43.6</td>
+            <td class="num" title="44054640 cycles at 1000 MHz, 22.7 FPS">44.05</td>
+          </tr>
+          <tr data-key="yolo11x-seg"
+              data-search="yolo11x-seg coco ultralytics yolo11-seg">
+            <th>yolo11x-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">62.14</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">44.1</td>
+            <td class="num">42.8</td>
+            <td class="num" title="85115879 cycles at 1000 MHz, 11.75 FPS">85.12</td>
+          </tr>
+          <tr data-key="yolo26n-seg"
+              data-search="yolo26n-seg coco ultralytics yolo26-seg">
+            <th>yolo26n-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">2.77</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">32.8</td>
+            <td class="num">32.6</td>
+            <td class="num" title="14531883 cycles at 1000 MHz, 68.81 FPS">14.53</td>
+          </tr>
+          <tr data-key="yolo26s-seg"
+              data-search="yolo26s-seg coco ultralytics yolo26-seg">
+            <th>yolo26s-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">10.44</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">38.6</td>
+            <td class="num">39.5</td>
+            <td class="num" title="19652007 cycles at 1000 MHz, 50.89 FPS">19.65</td>
+          </tr>
+          <tr data-key="yolo26m-seg"
+              data-search="yolo26m-seg coco ultralytics yolo26-seg">
+            <th>yolo26m-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">23.61</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">41.9</td>
+            <td class="num">43.3</td>
+            <td class="num" title="38832707 cycles at 1000 MHz, 25.75 FPS">38.83</td>
+          </tr>
+          <tr data-key="yolo26l-seg"
+              data-search="yolo26l-seg coco ultralytics yolo26-seg">
+            <th>yolo26l-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">28.01</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">43.3</td>
+            <td class="num">44.8</td>
+            <td class="num" title="47632386 cycles at 1000 MHz, 20.99 FPS">47.63</td>
+          </tr>
+          <tr data-key="yolo26x-seg"
+              data-search="yolo26x-seg coco ultralytics yolo26-seg">
+            <th>yolo26x-seg</th>
+            <td class="num">640x640</td>
+            <td class="num">62.86</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">44.7</td>
+            <td class="num">46.7</td>
+            <td class="num" title="91136633 cycles at 1000 MHz, 10.97 FPS">91.14</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<div>
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>mask mAP* (FP32)</th>
-				<th>mask mAP* (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td rowspan="2">Yolact-MobileNetV2</td>
-			<td rowspan="2">ONNX</td>
-			<td>512x512</td>
-			<td>36.40@IoU=0.5 <br /> 21.11@IoU=0.5:0.95</td>
-			<td>35.67@IoU=0.5 <br /> 20.71@IoU=0.5:0.95</td>
-			<td>29.6</td>
-			<!-- td></td -->
-			<td></td>
-			<td rowspan="2"><a href="https://github.com/haotian-liu/yolact_edge">link</a></td>
-		</tr>
-		<tr>
-			<td>640x640</td>
-			<td>38.23@IoU=0.5 <br /> 22.46@IoU=0.5:0.95</td>
-			<td>37.39@IoU=0.5 <br /> 21.97@IoU=0.5:0.95</td>
-			<td>46.1</td>
-			<!-- td></td -->
-			<td></td>
-		</tr>
-	</table>
-</div>
+    <p class="empty" hidden>Nothing in this task matches the filters.</p>
+  </section>
+  <section class="task" id="semantic-segmentation">
+    <div class="task-head">
+      <h2>Semantic Segmentation</h2>
+      <p><span class="shown">3</span> models</p>
+    </div>
 
-<p>* mask mAP uses mask IoU instead of IoU</p>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Network</th>
+            <th>Input Resolution</th>
+            <th>Param Size (M)</th>
+            <th>Source</th>
+            <th>Dataset</th>
+            <th>Accuracy Metric</th>
+            <th>FP32 Original Accuracy</th>
+            <th>Int8 Quantized Accuracy</th>
+            <th>Inference time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-key="pidnet-s"
+              data-search="pidnet-s cityscapes xujiacong/pidnet pidnet">
+            <th>pidnet-s</th>
+            <td class="num">1024x2048</td>
+            <td class="num">7.62</td>
+            <td>
+              <a href="https://github.com/XuJiacong/PIDNet" rel="noopener noreferrer" target="_blank">XuJiacong/PIDNet</a>
+            </td>
+            <td>Cityscapes</td>
+            <td><code>mIoU</code></td>
+            <td class="num">78.8</td>
+            <td class="num">78.6</td>
+            <td class="num" title="89911068 cycles at 1000 MHz, 11.12 FPS">89.91</td>
+          </tr>
+          <tr data-key="pidnet-m"
+              data-search="pidnet-m cityscapes xujiacong/pidnet pidnet">
+            <th>pidnet-m</th>
+            <td class="num">1024x2048</td>
+            <td class="num">28.53</td>
+            <td>
+              <a href="https://github.com/XuJiacong/PIDNet" rel="noopener noreferrer" target="_blank">XuJiacong/PIDNet</a>
+            </td>
+            <td>Cityscapes</td>
+            <td><code>mIoU</code></td>
+            <td class="num">77.0</td>
+            <td class="num">77.0</td>
+            <td class="num" title="167973429 cycles at 1000 MHz, 5.95 FPS">167.97</td>
+          </tr>
+          <tr data-key="pidnet-l"
+              data-search="pidnet-l cityscapes xujiacong/pidnet pidnet">
+            <th>pidnet-l</th>
+            <td class="num">1024x2048</td>
+            <td class="num">36.93</td>
+            <td>
+              <a href="https://github.com/XuJiacong/PIDNet" rel="noopener noreferrer" target="_blank">XuJiacong/PIDNet</a>
+            </td>
+            <td>Cityscapes</td>
+            <td><code>mIoU</code></td>
+            <td class="num">80.9</td>
+            <td class="num">80.7</td>
+            <td class="num" title="199726360 cycles at 1000 MHz, 5.01 FPS">199.73</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<h2 id="face_detection_networks">Face Detection Networks</h2>
+    <p class="empty" hidden>Nothing in this task matches the filters.</p>
+  </section>
+  <section class="task" id="pose-estimation">
+    <div class="task-head">
+      <h2>Pose Estimation</h2>
+      <p><span class="shown">15</span> models</p>
+    </div>
 
-<div>
-		
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td>Blaze Face</td>
-			<td>TFLITE*</td>
-			<td>128x128</td>
-			<td>0.046</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://github.com/google/mediapipe/tree/master/mediapipe/graphs/face_detection">link</a></td>
-		</tr>
-	</table>
-</div>
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>Network</th>
+            <th>Input Resolution</th>
+            <th>Param Size (M)</th>
+            <th>Source</th>
+            <th>Dataset</th>
+            <th>Accuracy Metric</th>
+            <th>FP32 Original Accuracy</th>
+            <th>Int8 Quantized Accuracy</th>
+            <th>Inference time (ms)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-key="yolov8n-pose"
+              data-search="yolov8n-pose coco-pose ultralytics yolov8-pose">
+            <th>yolov8n-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">3.36</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">50.4</td>
+            <td class="num">47.5</td>
+            <td class="num" title="9763307 cycles at 1000 MHz, 102.42 FPS">9.76</td>
+          </tr>
+          <tr data-key="yolov8s-pose"
+              data-search="yolov8s-pose coco-pose ultralytics yolov8-pose">
+            <th>yolov8s-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">11.68</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">59.7</td>
+            <td class="num">55.4</td>
+            <td class="num" title="13035290 cycles at 1000 MHz, 76.71 FPS">13.04</td>
+          </tr>
+          <tr data-key="yolov8m-pose"
+              data-search="yolov8m-pose coco-pose ultralytics yolov8-pose">
+            <th>yolov8m-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">26.51</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">64.5</td>
+            <td class="num">61.1</td>
+            <td class="num" title="25881415 cycles at 1000 MHz, 38.64 FPS">25.88</td>
+          </tr>
+          <tr data-key="yolov8l-pose"
+              data-search="yolov8l-pose coco-pose ultralytics yolov8-pose">
+            <th>yolov8l-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">44.53</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">67.2</td>
+            <td class="num">64.5</td>
+            <td class="num" title="39175270 cycles at 1000 MHz, 25.53 FPS">39.18</td>
+          </tr>
+          <tr data-key="yolov8x-pose"
+              data-search="yolov8x-pose coco-pose ultralytics yolov8-pose">
+            <th>yolov8x-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">69.53</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">68.7</td>
+            <td class="num">65.8</td>
+            <td class="num" title="68930253 cycles at 1000 MHz, 14.51 FPS">68.93</td>
+          </tr>
+          <tr data-key="yolo11n-pose"
+              data-search="yolo11n-pose coco-pose ultralytics yolo11-pose">
+            <th>yolo11n-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">2.93</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">50.2</td>
+            <td class="num">46.4</td>
+            <td class="num" title="10606762 cycles at 1000 MHz, 94.28 FPS">10.61</td>
+          </tr>
+          <tr data-key="yolo11s-pose"
+              data-search="yolo11s-pose coco-pose ultralytics yolo11-pose">
+            <th>yolo11s-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">9.97</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">58.7</td>
+            <td class="num">54.4</td>
+            <td class="num" title="14657118 cycles at 1000 MHz, 68.23 FPS">14.66</td>
+          </tr>
+          <tr data-key="yolo11m-pose"
+              data-search="yolo11m-pose coco-pose ultralytics yolo11-pose">
+            <th>yolo11m-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">20.96</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">64.8</td>
+            <td class="num">61.7</td>
+            <td class="num" title="27943185 cycles at 1000 MHz, 35.79 FPS">27.94</td>
+          </tr>
+          <tr data-key="yolo11l-pose"
+              data-search="yolo11l-pose coco-pose ultralytics yolo11-pose">
+            <th>yolo11l-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">26.21</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">66.1</td>
+            <td class="num">63.2</td>
+            <td class="num" title="37012338 cycles at 1000 MHz, 27.02 FPS">37.01</td>
+          </tr>
+          <tr data-key="yolo11x-pose"
+              data-search="yolo11x-pose coco-pose ultralytics yolo11-pose">
+            <th>yolo11x-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">58.82</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">69.2</td>
+            <td class="num">66.2</td>
+            <td class="num" title="69348610 cycles at 1000 MHz, 14.42 FPS">69.35</td>
+          </tr>
+          <tr data-key="yolo26n-pose"
+              data-search="yolo26n-pose coco-pose ultralytics yolo26-pose">
+            <th>yolo26n-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">2.99</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">56.7</td>
+            <td class="num">52.0</td>
+            <td class="num" title="12294003 cycles at 1000 MHz, 81.34 FPS">12.29</td>
+          </tr>
+          <tr data-key="yolo26s-pose"
+              data-search="yolo26s-pose coco-pose ultralytics yolo26-pose">
+            <th>yolo26s-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">10.43</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">62.3</td>
+            <td class="num">59.0</td>
+            <td class="num" title="16867027 cycles at 1000 MHz, 59.29 FPS">16.87</td>
+          </tr>
+          <tr data-key="yolo26m-pose"
+              data-search="yolo26m-pose coco-pose ultralytics yolo26-pose">
+            <th>yolo26m-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">21.61</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">68.0</td>
+            <td class="num">64.9</td>
+            <td class="num" title="29549119 cycles at 1000 MHz, 33.84 FPS">29.55</td>
+          </tr>
+          <tr data-key="yolo26l-pose"
+              data-search="yolo26l-pose coco-pose ultralytics yolo26-pose">
+            <th>yolo26l-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">26.00</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">69.5</td>
+            <td class="num">66.4</td>
+            <td class="num" title="38348620 cycles at 1000 MHz, 26.08 FPS">38.35</td>
+          </tr>
+          <tr data-key="yolo26x-pose"
+              data-search="yolo26x-pose coco-pose ultralytics yolo26-pose">
+            <th>yolo26x-pose</th>
+            <td class="num">640x640</td>
+            <td class="num">57.63</td>
+            <td>
+              <a href="https://github.com/ultralytics/ultralytics" rel="noopener noreferrer" target="_blank">Ultralytics</a>
+            </td>
+            <td>COCO-Pose</td>
+            <td><code>mAP50-95</code></td>
+            <td class="num">70.9</td>
+            <td class="num">68.7</td>
+            <td class="num" title="70318796 cycles at 1000 MHz, 14.22 FPS">70.32</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
-<p>* TfLite model is converted from ProtoBuf model.</p>
-	
-<h2 id="pose_estimation_networks">Pose Estimation Networks</h2>
+    <p class="empty" hidden>Nothing in this task matches the filters.</p>
+  </section>
 
-<h3>COCO2017 Results</h3>
+</main>
 
-<div>
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>OKS (FP32)</th>
-				<th>OKS (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td>YOLO-pose</td>
-			<td>ONNX</td>
-			<td>640x640</td>
-			<td>64.5</td>
-			<td>62.7</td>
-			<td>10.1</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://github.com/TexasInstruments/edgeai-yolov5/tree/yolo-pose">link</a></td>
-		</tr>
-	</table>
-</div>
-	
-<h2 id="lane_detection_networks">Lane Detection Networks</h2>
+<footer class="wrap foot">
+  <img class="logo-foot" src="assets/logo/mark-180.png" alt="">
+  <p>
+    <a href="run.html">Evaluation setup</a> &mdash; when these were measured, on what.
+  </p>
+</footer>
 
-<h3>CULane Results</h3>
-
-<div>
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>F1-Score (FP32)</th>
-				<th>F1-Score (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td>UFLD v1</td>
-			<td>ONNX</td>
-			<td>800x288</td>
-			<td>69.1</td>
-			<td>68.6</td>
-			<td>8.95</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://github.com/cfzd/Ultra-Fast-Lane-Detection">link</a></td>
-		</tr>
-	</table>
-</div>
-	
-<h2 id="mono_depth_estimation_networks">Monocular Depth Estimation Networks</h2>
-
-<h3>KITTI Eigen Split Results</h3>
-
-<div>
-	<table width="1280">
-		<thead>
-			<tr>
-				<th>Model Name</th>
-				<th>Type</th>
-				<th>Input Size</th>
-				<th>ARE (FP32)</th>
-				<th>ARE (INT8)</th>
-				<th>Giga MAC</th>
-				<!-- th>FPS</th -->
-				<th>Preview</th>
-				<th>Source</th>
-			</tr>
-		</thead>
-		<tr>
-			<td>Monodepth2</td>
-			<td>ONNX</td>
-			<td>640x192</td>
-			<td>11.1</td>
-			<td>12.6</td>
-			<td>8.74</td>
-			<!-- td></td -->
-			<td></td>
-			<td><a href="https://github.com/nianticlabs/monodepth2">link</a></td>
-		</tr>
-	</table>
-</div>
-	
-<h2>References</h2>
-<div>
-	<ul>
-		<li>
-			Classification Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/1801.04381">MobileNetV2: Inverted Residuals and Linear Bottlenecks</a></li>
-				<li><a href="https://arxiv.org/abs/1512.03385">Deep Residual Learning for Image Recognition</a></li>
-			</ul>
-		</li>
-		<li>
-			Object Detection Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/1512.02325">SSD: Single Shot MultiBox Detector</a></li>
-				<li><a href="https://arxiv.org/abs/1612.08242">YOLO9000: Better, Faster, Stronger</a></li>
-				<li><a href="https://arxiv.org/abs/1804.02767">YOLOv3: An Incremental Improvement</a></li>
-				<li><a href="https://arxiv.org/abs/2004.10934">YOLOv4: Optimal Speed and Accuracy of Object Detection</a></li>
-				<li><a href="https://arxiv.org/abs/2107.08430">YOLOX: Exceeding YOLO Series in 2021</a></li>
-				<li><a href="https://arxiv.org/abs/2207.02696">YOLOv7: Trainable bag-of-freebies sets new state-of-the-art for real-time object detectors</a></li>
-			</ul>
-		</li>
-		<li>
-			Semantic Segmentation Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/2206.02066">PIDNet: A Real-time Semantic Segmentation Network Inspired by PID Controllers</a></li>
-			</ul>
-		</li>
-		<li>
-			Instance Segmentation Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/1904.02689">YOLACT: Real-time Instance Segementation</a></li>
-				<li><a href="https://arxiv.org/abs/1912.06218">YOLACT++: Better Real-time Instance Segementation</a></li>
-				<li><a href="https://arxiv.org/abs/2012.12259">YolactEdge: Real-time Instance Segmentation on the Edge</a></li>
-			</ul>
-		</li>
-		<li>
-			Face Detection Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/1907.05047">BlazeFace: Sub-millisecond Neural Face Detection on Mobile GPUs</a></li>
-			</ul>
-		</li>
-		<li>
-			Pose Estimation Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/2204.06806">YOLO-Pose: Enhancing YOLO for Multi Person Estimation Using Object Keypoint Similarity Loss</a></li>
-			</ul>
-		</li>
-		<li>
-			Lane Detection Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/2004.11757">Ultra Fast Structure-aware Deep Lane Detection</a></li>
-			</ul>
-		</li>
-		<li>
-			Monocular Depth Estimation Networks
-			<ul>
-				<li><a href="https://arxiv.org/abs/1806.01260">Digging Into Self-Supervised Monocular Depth Estimation</a></li>
-			</ul>
-		</li>
-		<li>
-			DataSets
-			<ul>
-				<li><a href="https://www.image-net.org">ImageNet is an image database organized according to the WordNet hierarchy (currently only the nouns), in which each node of the hierarchy is depicted by hundreds and thousands of images.</a></li>
-				<li><a href="http://host.robots.ox.ac.uk/pascal/VOC/">PASCAL Visual Object Classes (VOC)</a></li>
-				<li><a href="https://cocodataset.org/">COCO is a large-scale object detection, segmentation, and captioning dataset. </a></li>
-				<li><a href="https://www.cityscapes-dataset.com">Cityscape: Benchmark suite and evaluation server for pixel-level, instance-level, and panoptic semantic labeling</a></li>
-				<li><a href="https://xingangpan.github.io/projects/CULane.html">CULane: CULane is a large scale challenging dataset for academic research on traffic lane detection.</a></li>
-				<li><a href="https://www.cvlibs.net/datasets/kitti/">KITTI: Dataset for stereo, optical flow, visual odometry, 3D object detection and 3D tracking</a></li>
-			</ul>
-		</li>
-		<li>
-			Metrics
-			<ul>
-				<li> <a href="http://host.robots.ox.ac.uk/pascal/VOC/pubs/everingham10.pdf">mAP: The PASCAL Visual Object Classes (VOC) Challenge</a></li>
-				<li><a href="https://arxiv.org/abs/1903.00241">Mask mAP: Mask Scoring R-CNN</a></li>
-				<li><a href="https://cocodataset.org/#detection-eval">Average Precision (AP): Detection Evaluation (COCO)</a></li>
-				<li><a href="https://cocodataset.org/#keypoints-eval">Object Keypoint Similarity (OKS): Keypoint Evaluation (COCO)</a></li>
-				<li><a href="https://en.wikipedia.org/wiki/F-score">F1-Score: F-score is a measure of a test's accuracy</a></li>
-				<li><a href="https://oecd.ai/en/catalogue/metrics/absolute-relative-error-%28are%29">Absolute Relative Error (ARE)</a></li>
-			</ul>
-		</li>
-	</ul>
-</div>
-
+<script src="static/zoo.js"></script>
 </body>
 </html>

@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Evaluation setup &middot; Enlight Pro Model Zoo</title>
+<link rel="icon" type="image/png" href="assets/logo/mark-32.png">
+<link rel="apple-touch-icon" href="assets/logo/mark-180.png">
+<link rel="stylesheet" href="static/fonts.css">
+<link rel="stylesheet" href="static/zoo.css">
+</head>
+<body>
+
+<header class="masthead">
+  <div class="wrap">
+    <a class="brand" href="index.html">
+      <img src="assets/logo/wordmark-88.png" alt="OPENEDGES">
+      <span class="divider"></span>
+      <span class="product">Enlight Pro Model Zoo</span>
+    </a>
+    <nav>
+      <a href="index.html">Models</a>
+      <a href="run.html">Evaluation setup</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <nav class="crumbs"><a href="index.html">Models</a> / <span>Evaluation setup</span></nav>
+
+  <section class="hero">
+    <h1>Evaluation setup</h1>
+    <p class="lede">
+      What the accuracy figures on the model table were produced with: the SDK that
+      quantized and compiled each model, and the machine the evaluation ran on.
+    </p>
+  </section>
+
+  <section class="panels">
+    <div class="panel">
+      <h2>Run</h2>
+      <dl class="pairs">
+        <dt>Evaluated</dt><dd>2026-10-06</dd>
+        <dt>Enlight SDK</dt><dd>3.1.3</dd>
+        <dt>Models published</dt><dd>87</dd>
+        <dt>Tasks</dt><dd>5</dd>
+      </dl>
+    </div>
+
+    <div class="panel">
+      <h2>Machine</h2>
+      <dl class="pairs">
+        <dt>CPU</dt><dd>AMD EPYC 7742 64-Core Processor (128 threads)</dd>
+        <dt>Memory</dt><dd>503.7 GiB</dd>
+        <dt>GPU</dt>
+        <dd>4 &times; NVIDIA A100-SXM4-40GB</dd>
+        <dt>OS</dt><dd>Ubuntu 22.04.5 LTS</dd>
+      </dl>
+    </div>
+  </section>
+
+  <p class="small">
+    The machine is the host the evaluation ran on. Accuracy is measured on the FP32 model
+    and on the quantized graph, and inference time comes from the Enlight simulator, so
+    neither figure is measured on this hardware.
+  </p>
+
+
+</main>
+
+<footer class="wrap foot">
+  <img class="logo-foot" src="assets/logo/mark-180.png" alt="">
+  <p>
+    <a href="run.html">Evaluation setup</a> &mdash; when these were measured, on what.
+  </p>
+</footer>
+
+</body>
+</html>
